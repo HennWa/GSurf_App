@@ -61,13 +61,14 @@ public class TestActivity extends AppCompatActivity {
         mChart.setData(data);
 
         // start thread for frame control of plot
-        startPlot();
+        //startPlot();
 
         // Instantiate and connect timeSampleViewModel to Live Data
         TimeSampleViewModelFactory timeSampleViewModelFactory;
         timeSampleViewModelFactory = new TimeSampleViewModelFactory(this.getApplication());
         timeSampleViewModel = new ViewModelProvider(this, timeSampleViewModelFactory).get(TimeSampleViewModel.class);
 
+        // Wennn gesamtes times sample database beobachtet werden soll
         /*timeSampleViewModel.getAllTimeSamples().observe(this, new Observer<List<TimeSample>>() {
             @Override
             public void onChanged(@Nullable List<TimeSample> timeSamples) {
@@ -96,6 +97,7 @@ public class TestActivity extends AppCompatActivity {
         });*/
 
 
+        // Wenn nur letzte pubkt beobachtet werden soll
         timeSampleViewModel.getLastTimeSample().observe(this, new Observer<TimeSample>() {
             @Override
             public void onChanged(@Nullable TimeSample timeSample) {
@@ -110,7 +112,6 @@ public class TestActivity extends AppCompatActivity {
                         //addChartEntry(1);
                         plotData();
                     }
-
                     plotData = false;
                 }
             }
@@ -132,6 +133,9 @@ public class TestActivity extends AppCompatActivity {
         buttonTest3.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                // Start thread for frame control of plot
+                startPlot();
+                // Start sensor data fetch
                 timeSampleViewModel.sensorDataFetch();
             }
         });
@@ -154,6 +158,7 @@ public class TestActivity extends AppCompatActivity {
         mChart.setData(null);
         timeSampleViewModel.stopSensorDataFetch();
         timeSampleViewModel.deleteAllTimeSamples();
+        timeSampleViewModel.deleteAllProcessedData();
         super.onDestroy();
     }
 
@@ -162,32 +167,6 @@ public class TestActivity extends AppCompatActivity {
         setResult(RESULT_OK, data);
         finish();
     }
-
-    /*private void addChartEntry(float entry){
-        LineData data = mChart.getData();
-
-        if(data !=null){
-            ILineDataSet set = data.getDataSetByIndex(0);
-            if(set==null){
-                set = createSet();
-                data.addDataSet(set);
-            }
-            data.addEntry(new Entry( set.getEntryCount(), entry), 0);
-            data.notifyDataChanged();
-            mChart.notifyDataSetChanged();   // both for data update necessary
-
-            //sets the visible number in the chart at first view to 5
-            mChart.setVisibleXRangeMaximum(5);
-            // enables drag to left/right
-            mChart.setDragEnabled(true);
-            // moves chart to the latest entry
-            mChart.moveViewToX(data.getEntryCount());
-            // do not forget to invalidate()
-            mChart.invalidate();
-            plotData = false;
-        }
-    } */
-
 
 
     private void addChartEntry(float entry){
@@ -222,9 +201,6 @@ public class TestActivity extends AppCompatActivity {
         }
     }
 
-
-
-
     // Set for plot
     private LineDataSet createSet(){
         LineDataSet set = new LineDataSet(null, "Dynamic Data");
@@ -255,6 +231,35 @@ public class TestActivity extends AppCompatActivity {
         });
         thread.start();
     }
+
+    // Add Entry and plot in one method, now in two methods
+    /*private void addChartEntry(float entry){
+        LineData data = mChart.getData();
+
+        if(data !=null){
+            ILineDataSet set = data.getDataSetByIndex(0);
+            if(set==null){
+                set = createSet();
+                data.addDataSet(set);
+            }
+            data.addEntry(new Entry( set.getEntryCount(), entry), 0);
+            data.notifyDataChanged();
+            mChart.notifyDataSetChanged();   // both for data update necessary
+
+            //sets the visible number in the chart at first view to 5
+            mChart.setVisibleXRangeMaximum(5);
+            // enables drag to left/right
+            mChart.setDragEnabled(true);
+            // moves chart to the latest entry
+            mChart.moveViewToX(data.getEntryCount());
+            // do not forget to invalidate()
+            mChart.invalidate();
+            plotData = false;
+        }
+    } */
+
+
+
 
 }
 

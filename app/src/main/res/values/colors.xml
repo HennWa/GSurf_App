@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <color name="dark_green">#00312A</color>
+    <color name="semi_dark_green">#045D56</color>
+    <color name="little_dark_green">#00837B</color>
+    <color name="primary_green">#00AEA4</color>
+    <color name="little_light_green">#15D1C6</color>
+    <color name="light_green">#56D1CA</color>
+    <color name="super_light_green">#8BD8D9</color>
+    <color name="ultra_light_green">#B7E1E1</color>
+    <color name="ultra_ultra_green">#DDEEEE</color>
+
+    <color name="dark_purple">#630076</color>
+    <color name="puple">#A000F1</color>
+    <color name="light_purple">#B15DFF</color>
+    <color name="dark_orange">#E83400</color>
+    <color name="primary_orange">#FFAC12</color>
+    <color name="light_orange">#FFDC78</color>
+    <color name="bg_dark">#27272F</color>
+    <color name="bg_semi_dark">#373740</color>
+
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>

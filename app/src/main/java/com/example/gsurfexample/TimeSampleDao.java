@@ -30,4 +30,6 @@ public interface TimeSampleDao {
     @Query("SELECT * FROM timesample_table ORDER BY id DESC LIMIT 1")
     LiveData<TimeSample> getLastTimeSamples();
 
+    @Query("SELECT * FROM timesample_table WHERE id = :id")
+    TimeSample getTimeSamplesByID(int id);
 }
