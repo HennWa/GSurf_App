@@ -1,8 +1,12 @@
 package com.example.gsurfexample;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,9 +17,11 @@ import androidx.recyclerview.widget.RecyclerView;
 public class NoteAdapter extends ListAdapter<Note, NoteAdapter.NoteHolder> {
 
     private onItemClickListener listener;
+    private Context context;
 
-    public NoteAdapter() {
+    public NoteAdapter(Context context) {
         super(DIFF_CALLBACK);
+        this.context = context;
     }
 
     private static final DiffUtil.ItemCallback<Note> DIFF_CALLBACK = new DiffUtil.ItemCallback<Note>() {
@@ -46,6 +52,12 @@ public class NoteAdapter extends ListAdapter<Note, NoteAdapter.NoteHolder> {
         holder.textViewTitle.setText(currentNote.getTitle());
         holder.textViewDescription.setText(currentNote.getDescription());
         holder.textViewPriority.setText(String.valueOf(currentNote.getPriority()));
+        holder.imageSession.setImageBitmap(getBitmapfromDrawable(R.drawable.test_image));
+    }
+
+    private Bitmap getBitmapfromDrawable(int drawableId){
+        Bitmap bitmap = BitmapFactory.decodeResource( context.getResources(), drawableId);
+        return bitmap;
     }
 
     public Note getNoteAt(int position){
@@ -57,12 +69,14 @@ public class NoteAdapter extends ListAdapter<Note, NoteAdapter.NoteHolder> {
         private TextView textViewTitle;
         private TextView textViewDescription;
         private TextView textViewPriority;
+        private ImageView imageSession;
 
         public NoteHolder(View itemView){
             super(itemView);
             textViewTitle = itemView.findViewById(R.id.text_view_title);
             textViewDescription = itemView.findViewById(R.id.text_view_description);
             textViewPriority = itemView.findViewById(R.id.text_view_priority);
+            imageSession = itemView.findViewById(R.id.image_view_session);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

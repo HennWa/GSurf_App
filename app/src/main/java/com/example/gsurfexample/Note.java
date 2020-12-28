@@ -1,5 +1,7 @@
 package com.example.gsurfexample;
 
+import android.graphics.Bitmap;
+
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -12,6 +14,7 @@ public class Note {
     private String title;
     private String description;
     private int priority;
+    //private Bitmap image;
 
 
     public Note(String title, String description, int priority) {
@@ -39,5 +42,7 @@ public class Note {
     public int getPriority() {
         return priority;
     }
+
+    //public Bitmap getImage(){ return image; }
 
 }

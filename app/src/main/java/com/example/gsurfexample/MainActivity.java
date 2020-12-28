@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
 
-        NoteAdapter adapter = new NoteAdapter();
+        NoteAdapter adapter = new NoteAdapter(this);
         recyclerView.setAdapter(adapter);
 
         // Instantiate and connect noteViewModel to Live Data

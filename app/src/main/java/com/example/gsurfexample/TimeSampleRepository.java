@@ -1,16 +1,23 @@
 package com.example.gsurfexample;
 
+import android.Manifest;
 import android.app.Application;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
@@ -22,6 +29,9 @@ public class TimeSampleRepository {
 
     // Attributes
     private Application application;
+    // Manager and listener
+    private LocationManager locationManager;
+    private LocationListener locationListener;
     // Interfaces and db access related
     private TimeSampleDao timeSampleDao;
     private ProcessedDataDao processedDataDao;
@@ -43,8 +53,11 @@ public class TimeSampleRepository {
     private Location location;
 
 
+    long lastTimeStamp;
+
+
     // Constructor
-    public TimeSampleRepository(Application app){
+    public TimeSampleRepository(Application app) {
 
         // Db and context related
         application = app;
@@ -56,24 +69,90 @@ public class TimeSampleRepository {
         allTimeSamples = timeSampleDao.getAllTimeSamples();
         lastTimeSample = timeSampleDao.getLastTimeSamples();
         allProcessedData = processedDataDao.getAllProcessedData();
+        // Register location listener and listen
+        // Shall this run in background thread? (Problem with Looper!)
+        locationManager = (LocationManager) application.getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(android.location.Location location) {
+
+                TimeSample timeSample = new TimeSample(System.currentTimeMillis(),
+                        measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
+                        measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
+                        measBField[0], measBField[1], measBField[2],
+                        measGyroscope[0], measGyroscope[1], measGyroscope[2],
+                        location.getLatitude(), location.getLongitude(), location.getAltitude(),
+                        location.getLatitude(), location.getLongitude());
+                insert(timeSample);
+            }
+        };
+        // Time sample observer for data processing
+        timeSamplesObserver = new Observer<List<TimeSample>>() {
+            @Override
+            public void onChanged(@Nullable List<TimeSample> timeSamples) {
+
+                // add entry into pipe
+                if(timeSamples.size() > 0){
+                    processingPipe.add(timeSamples.get(timeSamples.size() - 1).getId());
+                }
+
+                // create new dataProcessor
+                if(dataProcessor == null){
+                    dataProcessor = new DataProcessor(1f,1f,1f);
+                }
+
+                // Async task to process sensor data
+                if((processDataAsyncTask == null) ||
+                        (processDataAsyncTask.getStatus() == AsyncTask.Status.FINISHED)){
+                    processDataAsyncTask = new ProcessDataAsyncTask();
+                    processDataAsyncTask.execute();
+                }
+            }
+        };
     }
 
     // Nested classes
     // time_sample_table
     private class SensorDataFetch extends AsyncTask<Void, Void, Void> implements SensorEventListener {
 
+        private static final String TAG = "Repository";
+
         private float data;
         private long timeElapsed;
         private SensorManager sensorManager;
 
-        private SensorDataFetch(){
+
+        private SensorDataFetch() {
             sensorManager = (SensorManager) application.getSystemService(Context.SENSOR_SERVICE);
         }
 
         @Override
         protected Void doInBackground(Void... params) {
+
+            // Register sensor listener
             Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+            if (accelerometer != null) {
+                sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+                Log.d(TAG, "onCreate: Registered accelerometer listener");
+            } else {
+                Toast.makeText(application, "Accelerometer is not supported", Toast.LENGTH_SHORT).show();
+            }
+
+            Sensor gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+            if (gyroscope != null) {
+                sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_GAME);
+                Log.d(TAG, "onCreate: Registered gyroscope listener");
+            } else {
+                Toast.makeText(application, "Gyroscope is not supported", Toast.LENGTH_SHORT).show();
+            }
+
+            Sensor magnetic = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+            if (magnetic != null) {
+                sensorManager.registerListener(this, magnetic, SensorManager.SENSOR_DELAY_GAME);
+                Log.d(TAG, "onCreate: Registered magnetic field listener");
+            } else {
+                Toast.makeText(application, "Magnetic sensor is not supported", Toast.LENGTH_SHORT).show();
+            }
             return null;
         }
 
@@ -106,7 +185,7 @@ public class TimeSampleRepository {
                 measBField = sensorEvent.values;
             }
 
-            TimeSample timeSample = new TimeSample(System.currentTimeMillis()/1000,
+            TimeSample timeSample = new TimeSample(System.currentTimeMillis(),
                     measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
                     measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
                     measBField[0], measBField[1], measBField[2],
@@ -132,18 +211,14 @@ public class TimeSampleRepository {
 
             // process all timesamples of pipe till no more elements contained
             // (elements are continuously appended at the end)
-            while(processingPipe.size() > 0){
-
-                Log.i("hh", "closed thread------------------------------------------------------" + Integer.toString(processingPipe.size()));
+            while((processingPipe != null) && (processingPipe.size() > 0)){
 
                 processedData = dataProcessor.transferData(getTimeSamplesById(processingPipe.get(0)));
                 insert(processedData);
 
                 // remove first entry
                 processingPipe.remove(0);
-
             }
-            Log.i("hh", "closed thread!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             return null;
         }
     }
@@ -266,6 +341,7 @@ public class TimeSampleRepository {
     // Methods
     // time_sample
     public void sensorDataFetch(){
+        // Register sensor listener, take data from db, process it and write into new db
 
         // Fetch sensor data
         if(sensorDataFetch==null){
@@ -273,32 +349,17 @@ public class TimeSampleRepository {
         }
         sensorDataFetch.execute();
 
+        // Enable location listener
+        if (ActivityCompat.checkSelfPermission(application, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000,
+                    1, locationListener);
+        }
+
         // Data processing
         if(processingPipe == null){
             processingPipe = new ArrayList<Integer>();
         }
-        timeSamplesObserver = new Observer<List<TimeSample>>() {
-            @Override
-            public void onChanged(@Nullable List<TimeSample> timeSamples) {
-
-                // add entry into pipe
-                if(timeSamples.size() > 0){
-                    processingPipe.add(timeSamples.get(timeSamples.size() - 1).getId());
-                }
-
-                // create new dataProcessor
-                if(dataProcessor == null){
-                    dataProcessor = new DataProcessor(1f,1f,1f);
-                }
-
-                // Async task to process sensor data
-                if((processDataAsyncTask == null) ||
-                        (processDataAsyncTask.getStatus() == AsyncTask.Status.FINISHED)){
-                    processDataAsyncTask = new ProcessDataAsyncTask();
-                    processDataAsyncTask.execute();
-                }
-            }
-        };
         allTimeSamples.observeForever(timeSamplesObserver);
     }
 
@@ -309,6 +370,10 @@ public class TimeSampleRepository {
         if(allTimeSamples!=null){
             allTimeSamples.removeObserver(timeSamplesObserver);
         }
+        if(locationListener != null){
+            locationManager.removeUpdates(locationListener);
+        }
+        processingPipe = null;
     }
 
     public void insert(TimeSample timeSample){

@@ -1,6 +1,10 @@
 package com.example.gsurfexample;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +19,8 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -32,6 +38,7 @@ public class TestActivity extends AppCompatActivity {
 
     private TimeSampleViewModel timeSampleViewModel;
     private TextView xValue;
+    private Activity activityContext;
 
     // For plot
     private LineChart mChart;
@@ -45,6 +52,10 @@ public class TestActivity extends AppCompatActivity {
         setContentView(R.layout.activity_test);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
         setTitle("Test Activity");
+
+        activityContext = this;
+
+        // TextViews
         xValue = (TextView) findViewById(R.id.xValue);
 
         // Plot chart and its configuration
@@ -133,10 +144,19 @@ public class TestActivity extends AppCompatActivity {
         buttonTest3.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                // Start thread for frame control of plot
-                startPlot();
-                // Start sensor data fetch
-                timeSampleViewModel.sensorDataFetch();
+
+                // Permissions and execution
+                if(ContextCompat.checkSelfPermission(activityContext,Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED){
+                    // Start thread for frame control of plot
+                    startPlot();
+                    // Start sensor data fetch
+                    timeSampleViewModel.sensorDataFetch();
+                }else{
+                    ActivityCompat.requestPermissions(activityContext,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            1);
+                }
             }
         });
 

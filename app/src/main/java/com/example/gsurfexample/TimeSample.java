@@ -8,7 +8,7 @@ public class TimeSample {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
-    long timeStamp;
+    private long timeStamp;
     private double ddx, ddy, ddz;
     private double gFx, gFy, gFz;
     private double Bx, By, Bz;
@@ -52,6 +52,8 @@ public class TimeSample {
     public int getId() {
         return id;
     }
+
+    public long getTimeStamp() { return timeStamp; }
 
     public double getDdx() {
         return ddx; }
