@@ -128,8 +128,6 @@ public class TestActivity extends AppCompatActivity {
             }
         });
 
-
-
         // Button to get back to MainActivity
         FloatingActionButton buttonAddNote2 = findViewById(R.id.button_test2);
         buttonAddNote2.setOnClickListener(new View.OnClickListener(){

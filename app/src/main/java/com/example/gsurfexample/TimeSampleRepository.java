@@ -16,18 +16,24 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.concurrent.Executor;
 
 public class TimeSampleRepository {
 
     // Attributes
+    // General
+    private static final String TAG = "Repository";
     private Application application;
     // Manager and listener
     private LocationManager locationManager;
@@ -36,7 +42,9 @@ public class TimeSampleRepository {
     private TimeSampleDao timeSampleDao;
     private ProcessedDataDao processedDataDao;
     private SensorDataFetch sensorDataFetch;
-    // Data processing
+    // For data filtering
+    private LowPassFilter lowPassFilter;
+    // Data processing in DataProcessor
     private ProcessDataAsyncTask processDataAsyncTask;
     private Observer<List<TimeSample>> timeSamplesObserver;
     private ArrayList<Integer> processingPipe;
@@ -73,14 +81,14 @@ public class TimeSampleRepository {
             @Override
             public void onLocationChanged(android.location.Location location) {
 
-                TimeSample timeSample = new TimeSample(System.currentTimeMillis(),
+                // filter/aggregate data and store results in db
+                lowPassFilter.filterElement(new TimeSample(System.currentTimeMillis(),
                         measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
                         measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
                         measBField[0], measBField[1], measBField[2],
                         measGyroscope[0], measGyroscope[1], measGyroscope[2],
                         location.getLatitude(), location.getLongitude(), location.getAltitude(),
-                        location.getLatitude(), location.getLongitude());
-                insert(timeSample);
+                        location.getLatitude(), location.getLongitude()));
             }
         };
         // Time sample observer for data processing
@@ -109,13 +117,109 @@ public class TimeSampleRepository {
     }
 
     // Nested classes
+    // Filter
+    private class LowPassFilter{
+
+        // Attributes
+        private final long sampleRate; // in ms
+        private long nextSampleTime;
+        private float meanDdx, meanDdy, meanDdz;
+        private float meanGFx, meanGFy, meanGFz;
+        private float meanBx, meanBy, meanBz;
+        private float meanWx, meanWy, meanWz;
+        private float meanLat, meanLon, meanHeight;
+        private float meanXGPS, meanYGPS;
+
+        private List<TimeSample> filterCache;
+
+        // Constructor
+        public LowPassFilter(long sampleR) {
+            sampleRate = sampleR;
+            nextSampleTime = 0;
+            meanDdx = meanDdy = meanDdz = 0;
+            meanGFx = meanGFy = meanGFz = 0;
+            meanBx = meanBy = meanBz = 0;
+            meanWx = meanWy = meanWz = 0;
+            meanLat = meanLon = meanHeight = 0;
+            meanXGPS = meanYGPS = 0;
+            filterCache = new ArrayList<>();
+        }
+
+        // Methods
+        public void filterElement(TimeSample timeSample){
+        // filter applies mean of bins
+
+            filterCache.add(timeSample);
+
+            if(filterCache.size()==1){
+                nextSampleTime = filterCache.get(0).getTimeStamp() + sampleRate;
+            }
+
+            if(timeSample.getTimeStamp() > nextSampleTime){
+                int numElem = filterCache.size();
+                for(int i = 0; i < numElem-1; i++){
+                    meanDdx += (float) filterCache.get(0).getDdx();
+                    meanDdy += (float) filterCache.get(0).getDdy();
+                    meanDdz += (float) filterCache.get(0).getDdz();
+                    meanGFx += (float) filterCache.get(0).getGFx();
+                    meanGFy += (float) filterCache.get(0).getGFy();
+                    meanGFz += (float) filterCache.get(0).getGFz();
+                    meanBx += (float) filterCache.get(0).getBx();
+                    meanBy += (float) filterCache.get(0).getBy();
+                    meanBz += (float) filterCache.get(0).getBz();
+                    meanWx += (float) filterCache.get(0).getWx();
+                    meanWy += (float) filterCache.get(0).getWy();
+                    meanWz += (float) filterCache.get(0).getWz();
+                    meanLat += (float) filterCache.get(0).getLat();
+                    meanLon += (float) filterCache.get(0).getLon();
+                    meanHeight += (float) filterCache.get(0).getHeight();
+                    meanXGPS += (float) filterCache.get(0).getXGPS();
+                    meanYGPS += (float) filterCache.get(0).getYGPS();
+                    filterCache.remove(0);
+                }
+                meanDdx /= (numElem-1);
+                meanDdy /= (numElem-1);
+                meanDdz /= (numElem-1);
+                meanGFx /= (numElem-1);
+                meanGFy /= (numElem-1);
+                meanGFz /= (numElem-1);
+                meanBx /= (numElem-1);
+                meanBy /= (numElem-1);
+                meanBz /= (numElem-1);
+                meanWx /= (numElem-1);
+                meanWy /= (numElem-1);
+                meanWz /= (numElem-1);
+                meanLat /= (numElem-1);
+                meanLon /= (numElem-1);
+                meanHeight /= (numElem-1);
+                meanXGPS /= (numElem-1);
+                meanYGPS /= (numElem-1);
+
+                insert(new TimeSample( nextSampleTime-sampleRate/2,
+                        meanDdx, meanDdy, meanDdz,
+                        meanGFx, meanGFy, meanGFz,
+                        meanBx, meanBy, meanBz,
+                        meanWx, meanWy, meanWz,
+                        meanLat, meanLon, meanHeight,
+                        meanXGPS, meanYGPS));
+
+                Log.i("FILTER", Long.toString(nextSampleTime-sampleRate/2));
+
+                meanDdx = meanDdy = meanDdz = 0;
+                meanGFx = meanGFy = meanGFz = 0;
+                meanBx = meanBy = meanBz = 0;
+                meanWx = meanWy = meanWz = 0;
+                meanLat = meanLon = meanHeight = 0;
+                meanXGPS = meanYGPS = 0;
+                nextSampleTime += sampleRate;
+            }
+        }
+    }
+
     // time_sample_table
     private class SensorDataFetch extends AsyncTask<Void, Void, Void> implements SensorEventListener {
 
-        private static final String TAG = "Repository";
 
-        private float data;
-        private long timeElapsed;
         private SensorManager sensorManager;
 
 
@@ -125,6 +229,9 @@ public class TimeSampleRepository {
 
         @Override
         protected Void doInBackground(Void... params) {
+
+            // Instantiate new LowPassFilter
+            lowPassFilter = new LowPassFilter(100);
 
             // Register sensor listener
             Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -182,14 +289,14 @@ public class TimeSampleRepository {
                 measBField = sensorEvent.values;
             }
 
-            TimeSample timeSample = new TimeSample(System.currentTimeMillis(),
+            // filter/aggregate data and store results in db
+            lowPassFilter.filterElement(new TimeSample(System.currentTimeMillis(),
                     measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
                     measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
                     measBField[0], measBField[1], measBField[2],
                     measBField[0], measBField[1], measBField[2],
                     measBField[0], measBField[1], measBField[2],
-                    measBField[0], measBField[1]);
-            insert(timeSample);
+                    measBField[0], measBField[1]));
         }
 
         protected void unregisterListener() {
@@ -346,18 +453,20 @@ public class TimeSampleRepository {
         }
         sensorDataFetch.execute();
 
-        // Enable location listener
+        // Fetch location data (should be in background thread?)
         if (ActivityCompat.checkSelfPermission(application, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000,
                     1, locationListener);
         }
 
-        // Data processing
+        // Data processing (fetch LiveData, process and write to second db)
         if(processingPipe == null){
             processingPipe = new ArrayList<Integer>();
         }
-        allTimeSamples.observeForever(timeSamplesObserver);
+        if (!allTimeSamples.hasObservers()){
+            allTimeSamples.observeForever(timeSamplesObserver);
+        }
     }
 
     public void stopSensorDataFetch(){
