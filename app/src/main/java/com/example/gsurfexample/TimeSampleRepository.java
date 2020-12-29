@@ -53,9 +53,6 @@ public class TimeSampleRepository {
     private Location location;
 
 
-    long lastTimeStamp;
-
-
     // Constructor
     public TimeSampleRepository(Application app) {
 
@@ -424,7 +421,6 @@ public class TimeSampleRepository {
     public LiveData<List<ProcessedData>> getAllProcessedData() {
         return allProcessedData;
     }
-
 }
 
 
