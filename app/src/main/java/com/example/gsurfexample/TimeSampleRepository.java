@@ -219,9 +219,7 @@ public class TimeSampleRepository {
     // time_sample_table
     private class SensorDataFetch extends AsyncTask<Void, Void, Void> implements SensorEventListener {
 
-
         private SensorManager sensorManager;
-
 
         private SensorDataFetch() {
             sensorManager = (SensorManager) application.getSystemService(Context.SENSOR_SERVICE);
@@ -448,9 +446,10 @@ public class TimeSampleRepository {
         // Register sensor listener, take data from db, process it and write into new db
 
         // Fetch sensor data
-        if(sensorDataFetch==null){
-            sensorDataFetch = new SensorDataFetch();
+        if(sensorDataFetch!=null){
+            sensorDataFetch.unregisterListener();
         }
+        sensorDataFetch = new SensorDataFetch();
         sensorDataFetch.execute();
 
         // Fetch location data (should be in background thread?)

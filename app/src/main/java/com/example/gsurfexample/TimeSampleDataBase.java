@@ -30,9 +30,9 @@ public abstract class TimeSampleDataBase extends RoomDatabase {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            timeSampleDao.insert(new TimeSample(0, 0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+            timeSampleDao.insert(new TimeSample(0, .0f, .0f, .0f,
+                    .0f, .0f, .0f, .0f, .0f, .0f, .0f, .0f,
+                    .0f, 0.0, 0.0, 0.0, 0.0, 0.0));
             return null;
         }
     }
