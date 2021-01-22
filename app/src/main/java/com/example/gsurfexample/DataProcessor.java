@@ -10,6 +10,8 @@ public class DataProcessor {
     private final float BETAMADGWICK;               // Parameter of Madgwick algorithm
 
     private MadgwickAHRS madgwickAHRS;              // Sensor fusion algorithm
+    private Integrator integratorAcceleration;      // Integrator for integrating accelerations
+    private Integrator integratorVelocities;        // Integrator for integrating velocities
 
     // Constructor
     public DataProcessor(float samplePeriod, float cutoff, float betaMadgwick) {
@@ -18,10 +20,14 @@ public class DataProcessor {
         BETAMADGWICK = betaMadgwick;
 
         madgwickAHRS = new MadgwickAHRS(SAMPLEPERIOD, BETAMADGWICK);
+        integratorAcceleration = new Integrator(SAMPLEPERIOD);
+        integratorVelocities = new Integrator(SAMPLEPERIOD);
     }
 
     // Methods
     public ProcessedData transferData(TimeSample timeSample){
+        // Data processing chain
+
         int id = timeSample.getId();
 
         // Madgwick algorithm to calculate quaternion
@@ -38,16 +44,21 @@ public class DataProcessor {
         float[] globalAccelerations = quaternion.rotateVector(new float[] {timeSample.getDdx(),
                 timeSample.getDdy(), timeSample.getDdz()});
 
+        // Calculate global velocity and global position from acceleration
+        float[] globalVelocities = integratorAcceleration.cumTrapzIntegration(globalAccelerations);
+        float[] globalPosition = integratorVelocities.cumTrapzIntegration(globalVelocities);
+
+        // High-pass-filter for Z direction
+
 
         // Store in object
-        ProcessedData processedData = new ProcessedData(id,
-                233, globalAccelerations[0], globalAccelerations[1], globalAccelerations[2],
-                0.1f,0.1f, 0.1f, 0.1f, 0.1f,
-                0.1f, 0.1f, 0.1f, 0.1f,
-                quaternion.getX(),
-                quaternion.getY(),
-                quaternion.getZ(),
-                quaternion.getW(), // w value of quaternion according to python scipy convention (different from Madgwick)
+        ProcessedData processedData = new ProcessedData(id, 233,
+                globalAccelerations[0], globalAccelerations[1], globalAccelerations[2],
+                globalVelocities[0], globalVelocities[1], globalVelocities[2],
+                globalPosition[0], globalPosition[1], globalPosition[2],
+                0.1f, 0.1f, 0.1f,
+                timeSample.getWx(), timeSample.getWy(), timeSample.getWz(),
+                quaternion.getX(), quaternion.getY(), quaternion.getZ(), quaternion.getW(), // w value of quaternion according to python scipy convention (different from Madgwick)
                 0.1f, 0.1f);
 
         return processedData;

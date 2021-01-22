@@ -13,14 +13,17 @@ public class ProcessedData {
     private float ddX, ddY, ddZ;
     private float dX, dY, dZ;
     private float X, Y, Z;
+    private float XProc, YProc, ZProc;
     private float wx, wy, wz;
     private float q0, q1, q2, q3; // quaternions
     private float lat, lon;
 
 
-    public ProcessedData(int session_id, long timeStamp, float ddX, float ddY, float ddZ,
+    public ProcessedData(int session_id, long timeStamp,
+                         float ddX, float ddY, float ddZ,
                          float dX, float dY, float dZ,
                          float X, float Y, float Z,
+                         float XProc, float YProc, float ZProc,
                          float wx, float wy, float wz,
                          float q0, float q1, float q2, float q3,
                          float lat, float lon) {
@@ -37,6 +40,9 @@ public class ProcessedData {
         this.X = X;
         this.Y = Y;
         this.Z = Z;
+        this.XProc = XProc;
+        this.YProc = YProc;
+        this.ZProc = ZProc;
         this.wx = wx;
         this.wy = wy;
         this.wz = wz;
@@ -98,6 +104,18 @@ public class ProcessedData {
 
     public float getZ() {
         return Z;
+    }
+
+    public float getXProc() {
+        return XProc;
+    }
+
+    public float getYProc() {
+        return YProc;
+    }
+
+    public float getZProc() {
+        return ZProc;
     }
 
     public float getWx() {

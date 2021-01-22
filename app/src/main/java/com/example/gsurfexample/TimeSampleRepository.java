@@ -43,7 +43,7 @@ public class TimeSampleRepository {
     private ProcessedDataDao processedDataDao;
     private SensorDataFetch sensorDataFetch;
     // For data filtering
-    private LowPassFilter lowPassFilter;
+    private ResampleFilter resampleFilter;
     // Data processing in DataProcessor
     private ProcessDataAsyncTask processDataAsyncTask;
     private Observer<List<TimeSample>> timeSamplesObserver;
@@ -82,7 +82,7 @@ public class TimeSampleRepository {
             public void onLocationChanged(android.location.Location location) {
 
                 // filter/aggregate data and store results in db
-                lowPassFilter.filterElement(new TimeSample(System.currentTimeMillis(),
+                resampleFilter.filterElement(new TimeSample(System.currentTimeMillis(),
                         measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
                         measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
                         measBField[0], measBField[1], measBField[2],
@@ -118,7 +118,7 @@ public class TimeSampleRepository {
 
     // Nested classes
     // Filter
-    private class LowPassFilter{
+    private class ResampleFilter{
 
         // Attributes
         private final long sampleRate; // in ms
@@ -133,7 +133,7 @@ public class TimeSampleRepository {
         private List<TimeSample> filterCache;
 
         // Constructor
-        public LowPassFilter(long sampleR) {
+        public ResampleFilter(long sampleR) {
             sampleRate = sampleR;
             nextSampleTime = 0;
             meanDdx = meanDdy = meanDdz = 0;
@@ -228,8 +228,8 @@ public class TimeSampleRepository {
         @Override
         protected Void doInBackground(Void... params) {
 
-            // Instantiate new LowPassFilter
-            lowPassFilter = new LowPassFilter(100);
+            // Instantiate new ResampleFilter
+            resampleFilter = new ResampleFilter(100);
 
             // Register sensor listener
             Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -288,7 +288,7 @@ public class TimeSampleRepository {
             }
 
             // filter/aggregate data and store results in db
-            lowPassFilter.filterElement(new TimeSample(System.currentTimeMillis(),
+            resampleFilter.filterElement(new TimeSample(System.currentTimeMillis(),
                     measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
                     measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
                     measBField[0], measBField[1], measBField[2],
