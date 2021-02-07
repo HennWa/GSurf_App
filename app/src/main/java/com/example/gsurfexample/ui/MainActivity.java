@@ -1,4 +1,4 @@
-package com.example.gsurfexample;
+package com.example.gsurfexample.ui;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +17,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.gsurfexample.R;
+import com.example.gsurfexample.utils.factory.TestViewModelFactory;
+import com.example.gsurfexample.source.local.historic.Note;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;

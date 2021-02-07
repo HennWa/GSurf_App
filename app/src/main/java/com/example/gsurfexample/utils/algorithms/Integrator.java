@@ -1,4 +1,4 @@
-package com.example.gsurfexample;
+package com.example.gsurfexample.utils.algorithms;
 
 public class Integrator {
 

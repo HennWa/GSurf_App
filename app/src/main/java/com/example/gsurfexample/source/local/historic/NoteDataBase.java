@@ -1,4 +1,4 @@
-package com.example.gsurfexample;
+package com.example.gsurfexample.source.local.historic;
 
 import android.content.Context;
 import android.os.AsyncTask;

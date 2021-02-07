@@ -13,11 +13,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ArchitectureExample">
-        <activity android:name="com.example.gsurfexample.AddEditNoteActivity"
-            android:parentActivityName="com.example.gsurfexample.MainActivity"/>
-        <activity android:name="com.example.gsurfexample.TestActivity"
-            android:parentActivityName="com.example.gsurfexample.MainActivity"/>
-        <activity android:name="com.example.gsurfexample.MainActivity"
+        <activity android:name="com.example.gsurfexample.ui.AddEditNoteActivity"
+            android:parentActivityName="com.example.gsurfexample.ui.MainActivity"/>
+        <activity android:name="com.example.gsurfexample.ui.TestActivity"
+            android:parentActivityName="com.example.gsurfexample.ui.MainActivity"/>
+        <activity android:name="com.example.gsurfexample.ui.MainActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

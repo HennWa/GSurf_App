@@ -1,4 +1,4 @@
-package com.example.gsurfexample;
+package com.example.gsurfexample.source.local.live;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;

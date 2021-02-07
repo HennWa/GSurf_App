@@ -1,5 +1,8 @@
-package com.example.gsurfexample;
+package com.example.gsurfexample.utils.algorithms;
 
+
+import com.example.gsurfexample.source.local.live.ProcessedData;
+import com.example.gsurfexample.source.local.live.TimeSample;
 
 import java.lang.reflect.Array;
 

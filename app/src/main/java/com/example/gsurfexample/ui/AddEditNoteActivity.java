@@ -1,4 +1,4 @@
-package com.example.gsurfexample;
+package com.example.gsurfexample.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,6 +10,8 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Toast;
+
+import com.example.gsurfexample.R;
 
 public class AddEditNoteActivity extends AppCompatActivity {
     public static final String EXTRA_ID =

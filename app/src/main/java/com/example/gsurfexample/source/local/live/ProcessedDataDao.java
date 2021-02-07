@@ -1,4 +1,4 @@
-package com.example.gsurfexample;
+package com.example.gsurfexample.source.local.live;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -6,6 +6,8 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
+
+import com.example.gsurfexample.source.local.live.ProcessedData;
 
 import java.util.List;
 

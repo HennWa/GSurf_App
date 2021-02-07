@@ -1,9 +1,14 @@
-package com.example.gsurfexample;
+package com.example.gsurfexample.source.local.historic;
 
 import android.app.Application;
 import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
+
+import com.example.gsurfexample.source.local.historic.Note;
+import com.example.gsurfexample.source.local.historic.NoteDao;
+import com.example.gsurfexample.source.local.historic.NoteDataBase;
+
 import java.util.List;
 
 public class NoteRepository {

@@ -1,10 +1,12 @@
-package com.example.gsurfexample;
+package com.example.gsurfexample.utils.factory;
 
 
 import android.app.Application;
 
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.example.gsurfexample.ui.NoteViewModel;
 
 public class TestViewModelFactory  implements ViewModelProvider.Factory{
     static Application application;

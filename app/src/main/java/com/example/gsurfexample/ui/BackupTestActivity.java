@@ -1,4 +1,4 @@
-package com.example.gsurfexample;
+package com.example.gsurfexample.ui;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -11,6 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.gsurfexample.R;
+import com.example.gsurfexample.utils.factory.TimeSampleViewModelFactory;
+import com.example.gsurfexample.source.local.live.TimeSample;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;

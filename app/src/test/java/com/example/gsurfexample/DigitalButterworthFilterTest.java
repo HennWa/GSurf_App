@@ -1,5 +1,7 @@
 package com.example.gsurfexample;
 
+import com.example.gsurfexample.utils.algorithms.DigitalButterworthFilter;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

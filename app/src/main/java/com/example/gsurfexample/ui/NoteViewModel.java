@@ -1,10 +1,13 @@
-package com.example.gsurfexample;
+package com.example.gsurfexample.ui;
 
 import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+
+import com.example.gsurfexample.source.local.historic.Note;
+import com.example.gsurfexample.source.local.historic.NoteRepository;
 
 import java.util.List;
 
