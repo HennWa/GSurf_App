@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -14,15 +13,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.gsurfexample.R;
 import com.example.gsurfexample.source.local.live.ProcessedData;
 import com.example.gsurfexample.utils.factory.ProcessedDataViewModelFactory;
-import com.example.gsurfexample.utils.factory.TimeSampleViewModelFactory;
-import com.example.gsurfexample.source.local.live.TimeSample;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -33,7 +29,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class TestActivity extends AppCompatActivity {
 
-    private TimeSampleViewModel timeSampleViewModel;
     private ProcessedDataViewModel processedDataViewModel;
     private TextView xValue;
     private Activity activityContext;
@@ -73,9 +68,6 @@ public class TestActivity extends AppCompatActivity {
         //startPlot();
 
         // Instantiate and connect timeSampleViewModel to Live Data
-        TimeSampleViewModelFactory timeSampleViewModelFactory;
-        timeSampleViewModelFactory = new TimeSampleViewModelFactory(this.getApplication());
-        timeSampleViewModel = new ViewModelProvider(this, timeSampleViewModelFactory).get(TimeSampleViewModel.class);
         ProcessedDataViewModelFactory processedDataViewModelFactory;
         processedDataViewModelFactory = new ProcessedDataViewModelFactory(this.getApplication());
         processedDataViewModel = new ViewModelProvider(this, processedDataViewModelFactory).get(ProcessedDataViewModel.class);
@@ -108,27 +100,6 @@ public class TestActivity extends AppCompatActivity {
             }
         });*/
 
-
-        // Wenn nur letzte pubkt beobachtet werden soll
-        /*timeSampleViewModel.getLastTimeSample().observe(this, new Observer<TimeSample>() {
-            @Override
-            public void onChanged(@Nullable TimeSample timeSample) {
-
-                if (timeSample != null) {
-                    xValue.setText("xValue: " + (float) timeSample.getDdx());
-
-                    // add value to chart
-                    if(plotData) {
-
-                        addChartEntry((float) timeSample.getDdx());
-                        //addChartEntry(1);
-                        plotData();
-                    }
-                    plotData = false;
-                }
-            }
-        }); */
-
         // Wenn nur letzte pubkt beobachtet werden soll
         processedDataViewModel.getLastProcessedDataSample().observe(this, new Observer<ProcessedData>() {
             @Override
@@ -136,10 +107,6 @@ public class TestActivity extends AppCompatActivity {
 
                 if (processedData != null) {
                     xValue.setText("xValue: " + (float) processedData.getDdX());
-
-                    //Log.i("testactivity", "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
-                    //Log.i("testactivity", Float.toString(processedData.getDdX()));
-
 
                     // add value to chart
                     if(plotData) {
@@ -174,7 +141,7 @@ public class TestActivity extends AppCompatActivity {
                     // Start thread for frame control of plot
                     startPlot();
                     // Start sensor data fetch
-                    timeSampleViewModel.sensorDataFetch();
+                    processedDataViewModel.sensorDataFetch();
                 }else{
                     ActivityCompat.requestPermissions(activityContext,
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -199,9 +166,8 @@ public class TestActivity extends AppCompatActivity {
             thread.interrupt();
         }
         mChart.setData(null);
-        timeSampleViewModel.stopSensorDataFetch();
-        timeSampleViewModel.deleteAllTimeSamples();
-        timeSampleViewModel.deleteAllProcessedData();
+        processedDataViewModel.stopSensorDataFetch();
+        processedDataViewModel.deleteAllProcessedData();
         super.onDestroy();
     }
 
@@ -274,36 +240,6 @@ public class TestActivity extends AppCompatActivity {
         });
         thread.start();
     }
-
-    // Add Entry and plot in one method, now in two methods
-    /*private void addChartEntry(float entry){
-        LineData data = mChart.getData();
-
-        if(data !=null){
-            ILineDataSet set = data.getDataSetByIndex(0);
-            if(set==null){
-                set = createSet();
-                data.addDataSet(set);
-            }
-            data.addEntry(new Entry( set.getEntryCount(), entry), 0);
-            data.notifyDataChanged();
-            mChart.notifyDataSetChanged();   // both for data update necessary
-
-            //sets the visible number in the chart at first view to 5
-            mChart.setVisibleXRangeMaximum(5);
-            // enables drag to left/right
-            mChart.setDragEnabled(true);
-            // moves chart to the latest entry
-            mChart.moveViewToX(data.getEntryCount());
-            // do not forget to invalidate()
-            mChart.invalidate();
-            plotData = false;
-        }
-    } */
-
-
-
-
 }
 
 

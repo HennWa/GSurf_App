@@ -19,7 +19,6 @@ public class ResampleFilter{
     private float meanLat, meanLon, meanHeight;
     private float meanXGPS, meanYGPS;
     private TimeSample resampledTimeSampleData;
-
     private List<TimeSample> filterCache;
 
     // Constructor
@@ -40,7 +39,6 @@ public class ResampleFilter{
         // filter applies mean of bins
 
         filterCache.add(timeSample);
-
         if(filterCache.size()==1){
             nextSampleTime = filterCache.get(0).getTimeStamp() + sampleRate;
         }
@@ -92,8 +90,6 @@ public class ResampleFilter{
                                                                 meanWx, meanWy, meanWz,
                                                                 meanLat, meanLon, meanHeight,
                                                                 meanXGPS, meanYGPS);
-
-            Log.i("FILTER", Long.toString(nextSampleTime-sampleRate/2));
 
             meanDdx = meanDdy = meanDdz = 0;
             meanGFx = meanGFy = meanGFz = 0;

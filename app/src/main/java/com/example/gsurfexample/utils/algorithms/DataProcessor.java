@@ -1,6 +1,8 @@
 package com.example.gsurfexample.utils.algorithms;
 
 
+import android.util.Log;
+
 import com.example.gsurfexample.source.local.live.ProcessedData;
 import com.example.gsurfexample.source.local.live.TimeSample;
 
@@ -29,9 +31,12 @@ public class DataProcessor {
 
     // Methods
     public ProcessedData transferData(TimeSample timeSample){
+
+
+        Log.i("DATAPROCESSOR", "Into Processing" + Float.toString(timeSample.getDdx()));
+
         // Data processing chain
 
-        int id = timeSample.getId();
 
         // Madgwick algorithm to calculate quaternion
         madgwickAHRS.update(timeSample.getWx(), timeSample.getWy(), timeSample.getWz(),
@@ -55,7 +60,8 @@ public class DataProcessor {
 
 
         // Store in object
-        ProcessedData processedData = new ProcessedData(id, 233,
+        int id = 0;        // here real session id
+        ProcessedData processedData = new ProcessedData(id, timeSample.getTimeStamp(),
                 globalAccelerations[0], globalAccelerations[1], globalAccelerations[2],
                 globalVelocities[0], globalVelocities[1], globalVelocities[2],
                 globalPosition[0], globalPosition[1], globalPosition[2],

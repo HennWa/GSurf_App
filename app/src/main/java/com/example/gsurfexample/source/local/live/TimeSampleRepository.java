@@ -18,7 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
+
 
 import com.example.gsurfexample.utils.algorithms.DataProcessor;
 import com.example.gsurfexample.utils.algorithms.ResampleFilter;
@@ -36,20 +36,15 @@ public class TimeSampleRepository {
     private LocationManager locationManager;
     private LocationListener locationListener;
     // Interfaces and db access related
-    private TimeSampleDao timeSampleDao;
     private ProcessedDataDao processedDataDao;
     private SensorDataFetch sensorDataFetch;
     // For data filtering
     private ResampleFilter resampleFilter;
     // Data processing in DataProcessor
     private ProcessDataAsyncTask processDataAsyncTask;
-    private Observer<List<TimeSample>> timeSamplesObserver;
-    private ArrayList<Integer> processingPipe;
     private ArrayList<TimeSample> timeSampleCache;
     private DataProcessor dataProcessor;
     // Live Data
-    private LiveData<List<TimeSample>> allTimeSamples;
-    private LiveData<TimeSample> lastTimeSample;
     private LiveData<List<ProcessedData>> allProcessedData;
     private LiveData<ProcessedData> lastProcessedDataSample;
     // Buffer for sensor measurements
@@ -67,13 +62,10 @@ public class TimeSampleRepository {
         application = app;
         TimeSampleDataBase timeSampleDataBase = TimeSampleDataBase.getInstance(application);
         // Interfaces
-        timeSampleDao = timeSampleDataBase.timeSampleDao();
         processedDataDao = timeSampleDataBase.processedDataDao();
         // Cache
         timeSampleCache = new ArrayList<TimeSample>();
         // Live Data
-        allTimeSamples = timeSampleDao.getAllTimeSamples();
-        lastTimeSample = timeSampleDao.getLastTimeSamples();
         allProcessedData = processedDataDao.getAllProcessedData();
         lastProcessedDataSample = processedDataDao.getLastProcessedData();
         // Register location listener and listen
@@ -93,33 +85,9 @@ public class TimeSampleRepository {
                         location.getLatitude(), location.getLongitude()));
             }
         };
-        // Time sample observer for data processing
-        timeSamplesObserver = new Observer<List<TimeSample>>() {
-            @Override
-            public void onChanged(@Nullable List<TimeSample> timeSamples) {
-
-                // add entry into pipe
-                if(timeSamples.size() > 0){
-                    processingPipe.add(timeSamples.get(timeSamples.size() - 1).getId());
-                }
-
-                // create new dataProcessor
-                if(dataProcessor == null){
-                    dataProcessor = new DataProcessor(1f,1f,1f);
-                }
-
-                // Async task to process sensor data
-                if((processDataAsyncTask == null) ||
-                        (processDataAsyncTask.getStatus() == AsyncTask.Status.FINISHED)){
-                    processDataAsyncTask = new ProcessDataAsyncTask();
-                    processDataAsyncTask.execute();
-                }
-            }
-        };
     }
 
     // Nested classes
-    // time_sample_table
     private class SensorDataFetch extends AsyncTask<Void, Void, Void> implements SensorEventListener {
 
         private SensorManager sensorManager;
@@ -133,7 +101,7 @@ public class TimeSampleRepository {
         protected Void doInBackground(Void... params) {
 
             // Instantiate new ResampleFilter
-            resampleFilter = new ResampleFilter(100);
+            resampleFilter = new ResampleFilter(100);  // in global config file
 
             // Register sensor listener
             Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -202,9 +170,6 @@ public class TimeSampleRepository {
 
             if (resampledTimeSampleData!=null){
                 timeSampleCache.add(resampledTimeSampleData);
-
-                insert(resampledTimeSampleData);   // to be replaced
-
             }
 
             // create new dataProcessor
@@ -228,102 +193,22 @@ public class TimeSampleRepository {
     }
 
     private class ProcessDataAsyncTask extends AsyncTask<Void, Void, Void> {
-
-        ProcessedData processedData;
-
         @Override
         protected Void doInBackground(Void... voids) {
 
             // process all timesamples of pipe till no more elements contained
             // (elements are continuously appended at the end)
-            /*while((processingPipe != null) && (processingPipe.size() > 0)){
-
-                processedData = dataProcessor.transferData(getTimeSamplesById(processingPipe.get(0)));
-                insert(processedData);
-
-                // remove first entry
-                processingPipe.remove(0);
-            }*/
-
-            // process all timesamples of pipe till no more elements contained
-            // (elements are continuously appended at the end)
             while((timeSampleCache != null) && (timeSampleCache.size() > 0)) {
-
-                processedData = dataProcessor.transferData(timeSampleCache.get(0));
-
-                //Log.i("repository", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                //Log.i("repository", Float.toString(processedData.getDdX()));
-
-                insert(processedData);
-
+                insert(dataProcessor.transferData(timeSampleCache.get(0)));
                 // remove first entry
                 timeSampleCache.remove(0);
             }
-
-
-
-
             return null;
         }
     }
 
-    private static class InsertTimeSampleAsyncTask extends AsyncTask<TimeSample, Void, Void> {
-        private TimeSampleDao timeSampleDao;
 
-        private InsertTimeSampleAsyncTask(TimeSampleDao timeSampleDao){
-            this.timeSampleDao = timeSampleDao;
-        }
-
-        @Override
-        protected Void doInBackground(TimeSample... timeSamples){
-            timeSampleDao.insert(timeSamples[0]);
-            return null;
-        }
-    }
-
-    private static class UpdateTimeSampleAsyncTask extends AsyncTask<TimeSample, Void, Void> {
-        private TimeSampleDao timeSampleDao;
-
-        private UpdateTimeSampleAsyncTask(TimeSampleDao tmeSampleDao){
-            this.timeSampleDao = timeSampleDao;
-        }
-
-        @Override
-        protected Void doInBackground(TimeSample... timeSamples){
-            timeSampleDao.update(timeSamples[0]);
-            return null;
-        }
-    }
-
-    private static class DeleteTimeSampleAsyncTask extends AsyncTask<TimeSample, Void, Void> {
-        private TimeSampleDao timeSampleDao;
-
-        private DeleteTimeSampleAsyncTask(TimeSampleDao timeSampleDao){
-            this.timeSampleDao = timeSampleDao;
-        }
-
-        @Override
-        protected Void doInBackground(TimeSample... timeSamples){
-            timeSampleDao.delete(timeSamples[0]);
-            return null;
-        }
-    }
-
-    private static class DeleteAllTimeSamplesAsyncTask extends AsyncTask<Void, Void, Void> {
-        private TimeSampleDao timeSampleDao;
-
-        private DeleteAllTimeSamplesAsyncTask(TimeSampleDao timeSampleDao){
-            this.timeSampleDao = timeSampleDao;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids){
-            timeSampleDao.deleteAllTimeSamples();
-            return null;
-        }
-    }
-
-    // processed_data_table
+    // Async tasks for operations on processed_data_table
     private static class InsertProcessedDataAsyncTask extends AsyncTask<ProcessedData, Void, Void> {
         private ProcessedDataDao processedDataDao;
 
@@ -367,7 +252,6 @@ public class TimeSampleRepository {
     }
 
     private static class DeleteAllProcessedDataAsyncTask extends AsyncTask<Void, Void, Void> {
-        private ProcessedData timeSampleDao;
         private ProcessedDataDao processedDataDao;
 
         private DeleteAllProcessedDataAsyncTask(ProcessedDataDao processedDataDao){
@@ -383,9 +267,8 @@ public class TimeSampleRepository {
 
 
     // Methods
-    // time_sample
     public void sensorDataFetch(){
-        // Register sensor listener, take data from db, process it and write into new db
+        // Register sensor listener, take data from resampler, process it and write into new db
 
         // Fetch sensor data
         if(sensorDataFetch!=null){
@@ -400,58 +283,19 @@ public class TimeSampleRepository {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000,
                     1, locationListener);
         }
-
-        // Data processing (fetch LiveData, process and write to second db)
-        if(processingPipe == null){
-            processingPipe = new ArrayList<Integer>();
-        }
-        if (!allTimeSamples.hasObservers()){
-            allTimeSamples.observeForever(timeSamplesObserver);
-        }
     }
 
     public void stopSensorDataFetch(){
         if(sensorDataFetch!=null){
             sensorDataFetch.unregisterListener();
         }
-        if(allTimeSamples!=null){
-            allTimeSamples.removeObserver(timeSamplesObserver);
-        }
         if(locationListener != null){
             locationManager.removeUpdates(locationListener);
         }
-        processingPipe = null;
     }
 
-    public void insert(TimeSample timeSample){
-        new InsertTimeSampleAsyncTask(timeSampleDao).execute(timeSample);
-    }
 
-    public void update(TimeSample timesample){
-        new UpdateTimeSampleAsyncTask(timeSampleDao).execute(timesample);
-    }
-
-    public void delete(TimeSample timeSample){
-        new DeleteTimeSampleAsyncTask(timeSampleDao).execute(timeSample);
-    }
-
-    public void deleteAllTimeSamples(){
-        new DeleteAllTimeSamplesAsyncTask(timeSampleDao).execute();
-    }
-
-    public LiveData<List<TimeSample>> getAllTimeSamples() {
-        return allTimeSamples;
-    }
-
-    public LiveData<TimeSample> getLastTimeSamples() {
-        return lastTimeSample;
-    }
-
-    public TimeSample getTimeSamplesById(int id) {
-        return timeSampleDao.getTimeSamplesByID(id);
-    }
-
-    // processed data
+    // Dao operations on processed_data_table
     public void insert(ProcessedData processedData){
         new InsertProcessedDataAsyncTask(processedDataDao).execute(processedData);
     }

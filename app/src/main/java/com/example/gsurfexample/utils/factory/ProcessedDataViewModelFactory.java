@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.gsurfexample.ui.ProcessedDataViewModel;
-import com.example.gsurfexample.ui.TimeSampleViewModel;
 
 public class ProcessedDataViewModelFactory implements ViewModelProvider.Factory{
     static Application application;
