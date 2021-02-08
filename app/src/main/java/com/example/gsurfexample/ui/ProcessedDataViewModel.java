@@ -23,8 +23,8 @@ public class ProcessedDataViewModel extends AndroidViewModel {
     public ProcessedDataViewModel(@NonNull Application application) {
         super(application);
         repository = new TimeSampleRepository(application);
-        //lastProcessedDataSample = repository.getLastProcessedDataSample();
-        //allProcessedData = repository.getAllProcessedData();
+        lastProcessedDataSample = repository.getLastProcessedDataSample();
+        allProcessedData = repository.getAllProcessedData();
     }
 
     // Methods

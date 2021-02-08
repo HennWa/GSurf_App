@@ -51,6 +51,7 @@ public class TimeSampleRepository {
     private LiveData<List<TimeSample>> allTimeSamples;
     private LiveData<TimeSample> lastTimeSample;
     private LiveData<List<ProcessedData>> allProcessedData;
+    private LiveData<ProcessedData> lastProcessedDataSample;
     // Buffer for sensor measurements
     private float[] measAccelerometer = new float[3];
     private float[] measLinAcceleration = new float[3];
@@ -74,6 +75,7 @@ public class TimeSampleRepository {
         allTimeSamples = timeSampleDao.getAllTimeSamples();
         lastTimeSample = timeSampleDao.getLastTimeSamples();
         allProcessedData = processedDataDao.getAllProcessedData();
+        lastProcessedDataSample = processedDataDao.getLastProcessedData();
         // Register location listener and listen
         // Shall this run in background thread? (Problem with Looper!)
         locationManager = (LocationManager) application.getSystemService(Context.LOCATION_SERVICE);
@@ -249,8 +251,8 @@ public class TimeSampleRepository {
 
                 processedData = dataProcessor.transferData(timeSampleCache.get(0));
 
-                Log.i("repository", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                Log.i("repository", Float.toString(processedData.getDdX()));
+                //Log.i("repository", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                //Log.i("repository", Float.toString(processedData.getDdX()));
 
                 insert(processedData);
 
@@ -470,13 +472,13 @@ public class TimeSampleRepository {
         return allProcessedData;
     }
 
-    //public LiveData<ProcessedData> getLastProcessedDataSample() {
-    //    return lastProcessedDataSample;
-    //}
+    public LiveData<ProcessedData> getLastProcessedDataSample() {
+        return lastProcessedDataSample;
+    }
 
-    //public ProcessedData getProcessedDataSamplesById(int id) {
-    //    return processedDataDao.getProcessedDataSamplesById(id);
-    //}
+    public ProcessedData getProcessedDataSamplesById(int id) {
+        return processedDataDao.getProcessedDataSamplesById(id);
+    }
 
 }
 

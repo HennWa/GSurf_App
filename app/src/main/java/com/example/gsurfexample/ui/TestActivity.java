@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -13,10 +14,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.gsurfexample.R;
+import com.example.gsurfexample.source.local.live.ProcessedData;
+import com.example.gsurfexample.utils.factory.ProcessedDataViewModelFactory;
 import com.example.gsurfexample.utils.factory.TimeSampleViewModelFactory;
 import com.example.gsurfexample.source.local.live.TimeSample;
 import com.github.mikephil.charting.charts.LineChart;
@@ -30,6 +34,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 public class TestActivity extends AppCompatActivity {
 
     private TimeSampleViewModel timeSampleViewModel;
+    private ProcessedDataViewModel processedDataViewModel;
     private TextView xValue;
     private Activity activityContext;
 
@@ -71,6 +76,9 @@ public class TestActivity extends AppCompatActivity {
         TimeSampleViewModelFactory timeSampleViewModelFactory;
         timeSampleViewModelFactory = new TimeSampleViewModelFactory(this.getApplication());
         timeSampleViewModel = new ViewModelProvider(this, timeSampleViewModelFactory).get(TimeSampleViewModel.class);
+        ProcessedDataViewModelFactory processedDataViewModelFactory;
+        processedDataViewModelFactory = new ProcessedDataViewModelFactory(this.getApplication());
+        processedDataViewModel = new ViewModelProvider(this, processedDataViewModelFactory).get(ProcessedDataViewModel.class);
 
         // Wennn gesamtes times sample database beobachtet werden soll
         /*timeSampleViewModel.getAllTimeSamples().observe(this, new Observer<List<TimeSample>>() {
@@ -102,7 +110,7 @@ public class TestActivity extends AppCompatActivity {
 
 
         // Wenn nur letzte pubkt beobachtet werden soll
-        timeSampleViewModel.getLastTimeSample().observe(this, new Observer<TimeSample>() {
+        /*timeSampleViewModel.getLastTimeSample().observe(this, new Observer<TimeSample>() {
             @Override
             public void onChanged(@Nullable TimeSample timeSample) {
 
@@ -113,6 +121,30 @@ public class TestActivity extends AppCompatActivity {
                     if(plotData) {
 
                         addChartEntry((float) timeSample.getDdx());
+                        //addChartEntry(1);
+                        plotData();
+                    }
+                    plotData = false;
+                }
+            }
+        }); */
+
+        // Wenn nur letzte pubkt beobachtet werden soll
+        processedDataViewModel.getLastProcessedDataSample().observe(this, new Observer<ProcessedData>() {
+            @Override
+            public void onChanged(@Nullable ProcessedData processedData) {
+
+                if (processedData != null) {
+                    xValue.setText("xValue: " + (float) processedData.getDdX());
+
+                    //Log.i("testactivity", "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk");
+                    //Log.i("testactivity", Float.toString(processedData.getDdX()));
+
+
+                    // add value to chart
+                    if(plotData) {
+
+                        addChartEntry((float) processedData.getDdX());
                         //addChartEntry(1);
                         plotData();
                     }
