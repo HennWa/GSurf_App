@@ -32,4 +32,6 @@ public interface ProcessedDataDao {
     @Query("SELECT * FROM processed_data_table ORDER BY id DESC LIMIT 1")
     LiveData<ProcessedData> getLastProcessedData();
 
+    @Query("SELECT * FROM processed_data_table WHERE id = :id")
+    ProcessedData getProcessedDataSamplesById(int id);
 }

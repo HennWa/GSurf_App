@@ -12,25 +12,22 @@ import com.example.gsurfexample.source.local.live.TimeSampleRepository;
 
 import java.util.List;
 
-public class TimeSampleViewModel extends AndroidViewModel {
+public class ProcessedDataViewModel extends AndroidViewModel {
 
     // Attributes
     private TimeSampleRepository repository;
-    private LiveData<List<TimeSample>> allTimeSamples;
-    private LiveData<TimeSample> lastTimeSample;
+    private LiveData<ProcessedData> lastProcessedDataSample;
     private LiveData<List<ProcessedData>> allProcessedData;
 
     // Constructor
-    public TimeSampleViewModel(@NonNull Application application) {
+    public ProcessedDataViewModel(@NonNull Application application) {
         super(application);
         repository = new TimeSampleRepository(application);
-        allTimeSamples = repository.getAllTimeSamples();
-        lastTimeSample = repository.getLastTimeSamples();
+        //lastProcessedDataSample = repository.getLastProcessedDataSample();
         //allProcessedData = repository.getAllProcessedData();
     }
 
     // Methods
-    // time_sample
     public void sensorDataFetch(){
         repository.sensorDataFetch();
     }
@@ -39,31 +36,6 @@ public class TimeSampleViewModel extends AndroidViewModel {
         repository.stopSensorDataFetch();
     }
 
-    public void insert(TimeSample timeSample){
-        repository.insert(timeSample);
-    }
-
-    public void update(TimeSample timeSample){
-        repository.update(timeSample);
-    }
-
-    public void delete(TimeSample timeSample){
-        repository.delete(timeSample);
-    }
-
-    public void deleteAllTimeSamples(){
-        repository.deleteAllTimeSamples();
-    }
-
-    public LiveData<List<TimeSample>> getAllTimeSamples(){
-        return allTimeSamples;
-    }
-
-    public LiveData<TimeSample> getLastTimeSample(){
-        return lastTimeSample;
-    }
-
-    // processed_data
     public void insert(ProcessedData processedData){
         repository.insert(processedData);
     }
@@ -82,6 +54,10 @@ public class TimeSampleViewModel extends AndroidViewModel {
 
     public LiveData<List<ProcessedData>> getAllProcessedData(){
         return allProcessedData;
+    }
+
+    public LiveData<ProcessedData> getLastProcessedDataSample(){
+        return lastProcessedDataSample;
     }
 
 }
