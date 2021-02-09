@@ -7,22 +7,22 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.example.gsurfexample.source.local.live.ProcessedData;
+import com.example.gsurfexample.source.local.live.ProcessedDataRepository;
 import com.example.gsurfexample.source.local.live.TimeSample;
-import com.example.gsurfexample.source.local.live.TimeSampleRepository;
 
 import java.util.List;
 
 public class ProcessedDataViewModel extends AndroidViewModel {
 
     // Attributes
-    private TimeSampleRepository repository;
+    private ProcessedDataRepository repository;
     private LiveData<ProcessedData> lastProcessedDataSample;
     private LiveData<List<ProcessedData>> allProcessedData;
 
     // Constructor
     public ProcessedDataViewModel(@NonNull Application application) {
         super(application);
-        repository = new TimeSampleRepository(application);
+        repository = new ProcessedDataRepository(application);
         lastProcessedDataSample = repository.getLastProcessedDataSample();
         allProcessedData = repository.getAllProcessedData();
     }

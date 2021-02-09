@@ -17,8 +17,8 @@ import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
+import com.example.gsurfexample.source.local.live.ProcessedDataRepository;
 import com.example.gsurfexample.source.local.live.TimeSample;
-import com.example.gsurfexample.source.local.live.TimeSampleRepository;
 import com.example.gsurfexample.utils.algorithms.DataProcessor;
 import com.example.gsurfexample.utils.algorithms.ResampleFilter;
 
@@ -37,7 +37,7 @@ public class SensorDataFetch extends AsyncTask<Void, Void, Void> implements Sens
     // General
     private static final String TAG = "SensorDataFetch";
     private Application application;
-    private TimeSampleRepository timeSampleRepository;
+    private ProcessedDataRepository processedDataRepository;
     // Manager and listener
     private SensorManager sensorManager;
     private LocationManager locationManager;
@@ -59,10 +59,10 @@ public class SensorDataFetch extends AsyncTask<Void, Void, Void> implements Sens
      * @param app   Application object for registering Sensor managers.
      * @param repository Repository for accessing the database to store processed data.
      */
-    public SensorDataFetch(Application app, TimeSampleRepository repository) {
+    public SensorDataFetch(Application app, ProcessedDataRepository repository) {
         // Initialization
         application = app;
-        timeSampleRepository = repository;
+        processedDataRepository = repository;
         timeSampleCache = new ArrayList<TimeSample>();
         dataProcessor = new DataProcessor(1f,1f,1f); // from global config
 
@@ -110,7 +110,7 @@ public class SensorDataFetch extends AsyncTask<Void, Void, Void> implements Sens
         @Override
         protected Void doInBackground(Void... voids) {
             while((timeSampleCache != null) && (timeSampleCache.size() > 0)) {
-                timeSampleRepository.insert(dataProcessor.transferData(timeSampleCache.get(0)));
+                processedDataRepository.insert(dataProcessor.transferData(timeSampleCache.get(0)));
                 timeSampleCache.remove(0);
             }
             return null;

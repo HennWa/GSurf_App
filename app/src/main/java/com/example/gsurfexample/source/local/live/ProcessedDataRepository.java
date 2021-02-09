@@ -9,10 +9,10 @@ import com.example.gsurfexample.utils.sensors.SensorDataFetch;
 import java.util.List;
 
 /**
- * TimeSampleRepository provides access to Room database and methods to trigger and stop data
+ * ProcessedDataRepository provides access to Room database and methods to trigger and stop data
  * fetching from sensors.
  */
-public class TimeSampleRepository {
+public class ProcessedDataRepository {
 
     // Attributes
     // General
@@ -30,7 +30,7 @@ public class TimeSampleRepository {
      * Constructor.
      * @param app   Application object for connecting to Room database
      */
-    public TimeSampleRepository(Application app) {
+    public ProcessedDataRepository(Application app) {
         // Initialization
         application = app;
         TimeSampleDataBase timeSampleDataBase = TimeSampleDataBase.getInstance(application);
