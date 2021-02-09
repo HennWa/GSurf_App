@@ -1,12 +1,17 @@
 package com.example.gsurfexample.utils.algorithms;
 
-import android.util.Log;
 
 import com.example.gsurfexample.source.local.live.TimeSample;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ResampleFilter resamples TimeSamples. It stores a list of TimeSamples and calculates the mean
+ * of every features over the whole list once a sample time is above a given period. This time
+ * threshold is updated after every iteration.
+ * Requirements: TimeSample in sequential order.
+ */
 public class ResampleFilter{
 
     // Attributes
@@ -21,6 +26,10 @@ public class ResampleFilter{
     private TimeSample resampledTimeSampleData;
     private List<TimeSample> filterCache;
 
+    /**
+     * Constructor.
+     * @param sampleR  Sample rate used.
+     */
     // Constructor
     public ResampleFilter(long sampleR) {
         sampleRate = sampleR;
@@ -34,10 +43,15 @@ public class ResampleFilter{
         filterCache = new ArrayList<>();
     }
 
-    // Methods
-    public TimeSample filterElement(TimeSample timeSample){
-        // filter applies mean of bins
 
+
+    // Methods
+    /**
+     * Takes a new TimeSample into a list and carries out resampling.
+     * @param timeSample  Next TimeSample to be resampled.
+     * @return Resampled TimeSample or null if period not complete.
+     */
+    public TimeSample filterElement(TimeSample timeSample){
         filterCache.add(timeSample);
         if(filterCache.size()==1){
             nextSampleTime = filterCache.get(0).getTimeStamp() + sampleRate;
