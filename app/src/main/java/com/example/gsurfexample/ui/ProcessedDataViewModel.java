@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData;
 
 import com.example.gsurfexample.source.local.live.ProcessedData;
 import com.example.gsurfexample.source.local.live.ProcessedDataRepository;
-import com.example.gsurfexample.source.local.live.TimeSample;
 
 import java.util.List;
 

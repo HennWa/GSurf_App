@@ -33,11 +33,8 @@ public class DataProcessor {
     public ProcessedData transferData(TimeSample timeSample){
 
 
-        Log.i("DATAPROCESSOR", "Into Processing" + Float.toString(timeSample.getDdx()));
 
         // Data processing chain
-
-
         // Madgwick algorithm to calculate quaternion
         madgwickAHRS.update(timeSample.getWx(), timeSample.getWy(), timeSample.getWz(),
                 timeSample.getDdx(), timeSample.getDdy(), timeSample.getDdz(),
@@ -47,10 +44,19 @@ public class DataProcessor {
         Quaternion quaternion = new Quaternion(Array.getFloat(madgwickAHRS.getQuaternion(), 1),
                 Array.getFloat(madgwickAHRS.getQuaternion(), 2),
                 Array.getFloat(madgwickAHRS.getQuaternion(), 3),
-                Array.getFloat(madgwickAHRS.getQuaternion(), 0)); // Note different index convention
+                Array.getFloat(madgwickAHRS.getQuaternion(), 0)); // Note different index convention in JAVA Quaternion version
 
         float[] globalAccelerations = quaternion.rotateVector(new float[] {timeSample.getDdx(),
                 timeSample.getDdy(), timeSample.getDdz()});
+
+
+        Log.i("DATAPROCESSOR", "Into Processing Ddx: " + Float.toString(timeSample.getDdx())
+                + " Ddy: " + Float.toString(timeSample.getDdy())
+                + " Ddz: " + Float.toString(timeSample.getDdz()));
+        Log.i("DATAPROCESSOR", "Calculated DdX: " + Float.toString(globalAccelerations[0])
+                + " DdY: " + Float.toString(globalAccelerations[1])
+                + " DdZ: " + Float.toString(globalAccelerations[2]));
+
 
         // Calculate global velocity and global position from acceleration
         float[] globalVelocities = integratorAcceleration.cumTrapzIntegration(globalAccelerations);

@@ -7,6 +7,8 @@ package com.example.gsurfexample.utils.algorithms;
  *
  * @see <a
  *      href="http://www.x-io.co.uk/open-source-imu-and-ahrs-algorithms">http://www.x-io.co.uk/open-source-imu-and-ahrs-algorithms/</a>
+ *
+ *      NOTE: Correction in line 184, 186
  */
 
 public class MadgwickAHRS {
@@ -179,9 +181,9 @@ public class MadgwickAHRS {
                 + _2q2 * mz * q4 - mx * q3q3 - mx * q4q4;
         hy = _2q1mx * q4 + my * q1q1 - _2q1mz * q2 + _2q2mx * q3 - my * q2q2
                 + my * q3q3 + _2q3 * mz * q4 - my * q4q4;
-        _2bx = (float) Math.sqrt(hx * hx + hy * hy);
-        _2bz = -_2q1mx * q3 + _2q1my * q2 + mz * q1q1 + _2q2mx * q4 - mz * q2q2
-                + _2q3 * my * q4 - mz * q3q3 + mz * q4q4;
+        _2bx = ((float) Math.sqrt(hx * hx + hy * hy))  * 2f;                     // *2f Correction to original
+        _2bz = (-_2q1mx * q3 + _2q1my * q2 + mz * q1q1 + _2q2mx * q4 - mz * q2q2
+                + _2q3 * my * q4 - mz * q3q3 + mz * q4q4)  * 2f;                 // *2f Correction to original
         _4bx = 2f * _2bx;
         _4bz = 2f * _2bz;
 
