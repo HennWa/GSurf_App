@@ -110,7 +110,7 @@ public class SensorDataFetch extends AsyncTask<Void, Void, Void> implements Sens
         @Override
         protected Void doInBackground(Void... voids) {
             while((timeSampleCache != null) && (timeSampleCache.size() > 0)) {
-                processedDataRepository.insert(dataProcessor.transferData(timeSampleCache.get(0)));
+                processedDataRepository.insert(dataProcessor.processTimeSample(timeSampleCache.get(0)));
                 timeSampleCache.remove(0);
             }
             return null;
@@ -206,7 +206,7 @@ public class SensorDataFetch extends AsyncTask<Void, Void, Void> implements Sens
         // Async task to process data in cache
         if((processDataAsyncTask == null) ||
                 (processDataAsyncTask.getStatus() == Status.FINISHED)){
-            processDataAsyncTask = new com.example.gsurfexample.utils.sensors.SensorDataFetch.ProcessDataAsyncTask();
+            processDataAsyncTask = new ProcessDataAsyncTask();
             processDataAsyncTask.execute();
         }
     }

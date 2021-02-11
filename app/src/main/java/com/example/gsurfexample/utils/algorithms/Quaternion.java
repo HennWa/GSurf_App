@@ -61,7 +61,7 @@ public class Quaternion {
         return matrix;
     }
 
-    float[] rotateVector(float[] vec){
+    public float[] rotateVector(float[] vec){
 
         float[] res = new float[3];
         float[][] matrix = this.asMatrix();
