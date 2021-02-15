@@ -21,8 +21,11 @@ import com.example.gsurfexample.source.local.live.ProcessedDataRepository;
 import com.example.gsurfexample.source.local.live.TimeSample;
 import com.example.gsurfexample.utils.algorithms.DataProcessor;
 import com.example.gsurfexample.utils.algorithms.ResampleFilter;
+import com.example.gsurfexample.utils.other.GlobalParams;
 
 import java.util.ArrayList;
+
+import static android.os.Build.VERSION_CODES.R;
 
 /**
  * SensorDataFetch connects to the sensors by calling listener in an AsyncTask and connects
@@ -44,7 +47,7 @@ public class SensorDataFetch extends AsyncTask<Void, Void, Void> implements Sens
     private LocationListener locationListener;
     // For data filtering
     private ResampleFilter resampleFilter;
-    private TimeSample resampledTimeSampleData;
+    private TimeSample resampledTimeSampleDataOrNull;
     // Data processing in DataProcessor
     private ProcessDataAsyncTask processDataAsyncTask;
     private ArrayList<TimeSample> timeSampleCache;
@@ -77,7 +80,7 @@ public class SensorDataFetch extends AsyncTask<Void, Void, Void> implements Sens
             @Override
             public void onLocationChanged(Location location) {
                 // Filter/aggregate data and store results in cache (result null or resampled TimeSample)
-                resampledTimeSampleData = resampleFilter.filterElement(new TimeSample(System.currentTimeMillis(),
+                resampledTimeSampleDataOrNull = resampleFilter.filterElement(new TimeSample(System.currentTimeMillis(),
                         measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
                         measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
                         measBField[0], measBField[1], measBField[2],
@@ -85,8 +88,8 @@ public class SensorDataFetch extends AsyncTask<Void, Void, Void> implements Sens
                         location.getLatitude(), location.getLongitude(), location.getAltitude(),
                         location.getLatitude(), location.getLongitude()));
 
-                if (resampledTimeSampleData!=null){
-                    timeSampleCache.add(resampledTimeSampleData);
+                if (resampledTimeSampleDataOrNull!=null){
+                    timeSampleCache.add(resampledTimeSampleDataOrNull);
                 }
             }
         };
@@ -123,7 +126,7 @@ public class SensorDataFetch extends AsyncTask<Void, Void, Void> implements Sens
      */
     @Override
     protected Void doInBackground(Void... params) {
-        resampleFilter = new ResampleFilter(100);  // in global config file
+        resampleFilter = new ResampleFilter(GlobalParams.getInstance().getSampleR());  // in global config file
 
         Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         if (accelerometer != null) {
@@ -192,15 +195,15 @@ public class SensorDataFetch extends AsyncTask<Void, Void, Void> implements Sens
             measBField = sensorEvent.values;
         }
         // filter/aggregate data and store results in cache (result null or resampled TimeSample)
-        resampledTimeSampleData = resampleFilter.filterElement(new TimeSample(System.currentTimeMillis(),
+        resampledTimeSampleDataOrNull = resampleFilter.filterElement(new TimeSample(System.currentTimeMillis(),
                 measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
                 measAccelerometer[0], measAccelerometer[1], measAccelerometer[2],
                 measBField[0], measBField[1], measBField[2],
                 measBField[0], measBField[1], measBField[2],
                 measBField[0], measBField[1], measBField[2],
                 measBField[0], measBField[1]));
-        if (resampledTimeSampleData!=null){
-            timeSampleCache.add(resampledTimeSampleData);
+        if (resampledTimeSampleDataOrNull!=null){
+            timeSampleCache.add(resampledTimeSampleDataOrNull);
         }
 
         // Async task to process data in cache
