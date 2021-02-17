@@ -1,14 +1,9 @@
 package com.example.gsurfexample;
 
-import android.util.Log;
 
 import com.example.gsurfexample.utils.algorithms.MadgwickAHRS;
-import com.example.gsurfexample.utils.algorithms.Quaternion;
 
 import org.junit.Test;
-
-import java.lang.reflect.Array;
-import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
