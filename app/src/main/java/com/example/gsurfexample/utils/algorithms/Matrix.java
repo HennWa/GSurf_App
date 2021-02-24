@@ -19,6 +19,42 @@ public class Matrix {
         data = new double[rows][cols];
     }
 
+    public double[][] getData() {
+        return this.data;
+    }
+
+    public double[] getDataFlat() {
+        int numElem = this.rows*this.cols;
+        double[] flatData = new double[numElem];
+        for (int r = 0; r < this.rows; ++r) {
+            for (int c = 0; c < this.cols; ++c) {
+                flatData[c+r*cols] = data[r][c];
+            }
+        }
+        return flatData;
+    }
+
+    public double[][] getData(int rowStart, int rowEnd, int colStart, int colEnd){
+        Matrix m = this.getSubMatrix(rowStart, rowEnd, colStart, colEnd);
+        return m.getData();
+    }
+
+    public Matrix getSubMatrix(int rowStart, int rowEnd, int colStart, int colEnd) {
+        assert(rowStart <= rowEnd);
+        assert(colStart <= colEnd);
+        assert(rowEnd <= rows);
+        assert(colEnd <= cols);
+        int mRows = rowEnd-rowStart+1;
+        int mCols = colEnd-colStart+1;
+        Matrix m = new Matrix(mRows, mCols);
+        for (int r = 0; r < mRows; ++r) {
+            for (int c = 0; c < mCols; ++c) {
+                m.data[r][c] = data[r+rowStart][c+colStart];
+            }
+        }
+        return m;
+    }
+
     public void setData(double... args) {
         assert(args.length == rows * cols);
         for (int r = 0; r < rows; ++r) {
@@ -26,6 +62,50 @@ public class Matrix {
                 data[r][c] = args[r*cols + c];
             }
         }
+    }
+
+    public void setData(float... args) {
+        assert(args.length == rows * cols);
+        for (int r = 0; r < rows; ++r) {
+            for (int c = 0; c < cols; ++c) {
+                data[r][c] = (double)args[r*cols + c];
+            }
+        }
+    }
+
+    public void setDataByIndex(int r1, int rEnd, int c1, int cEnd, double... args) {
+        assert(rEnd<=rows);
+        assert(cEnd<=cols);
+        assert(cEnd>=c1);
+        assert(rEnd>=r1);
+        assert(args.length == (rEnd-r1+1) * (cEnd-c1+1));
+        for (int r = r1; r <= rEnd; ++r) {
+            for (int c = c1; c <= cEnd; ++c) {
+                data[r][c] = (double)args[r*(cEnd-c1+1) + c-c1];
+            }
+        }
+    }
+
+    public void setDataByIndex(int r1, int rEnd, int c1, int cEnd, float... args) {
+        double[] argsDouble = new double[args.length];
+        for (int i = 0; i < args.length; ++i) {
+            argsDouble[i] = (double)args[i];
+        }
+        this.setDataByIndex(r1, rEnd, c1, cEnd, argsDouble);
+    }
+
+    public void setIdentityDiag() {
+        for (int r = 0; r < rows; ++r) {
+            for (int c = 0; c < cols; ++c) {
+                data[r][c] = 0.0;
+            }
+            data[r][r] = 1.0;
+        }
+    }
+
+    public void setIdentity() {
+        assert(rows == cols);
+        setIdentityDiag();
     }
 
     public void print() {
@@ -41,33 +121,6 @@ public class Matrix {
     public int[] shape() {
         int[] shape = {this.rows, this.cols};
         return shape;
-    }
-
-    public double[][] getData() {
-        return this.data;
-    }
-
-    public void setData(float... args) {
-        assert(args.length == rows * cols);
-        for (int r = 0; r < rows; ++r) {
-            for (int c = 0; c < cols; ++c) {
-                data[r][c] = (double)args[r*cols + c];
-            }
-        }
-    }
-
-    public void setIdentityDiag() {
-        for (int r = 0; r < rows; ++r) {
-            for (int c = 0; c < cols; ++c) {
-                data[r][c] = 0.0;
-            }
-            data[r][r] = 1.0;
-        }
-    }
-
-    public void setIdentity() {
-        assert(rows == cols);
-        setIdentityDiag();
     }
 
     public static void matrixAdd(Matrix ma,
@@ -135,6 +188,55 @@ public class Matrix {
                 }
             } //for col
         } //for row
+    }
+
+    public static void matrixMultiply(double k, Matrix m, Matrix y) {
+        assert(m != null);
+        assert(y != null);
+        assert(m.rows == y.rows);
+        assert(m.cols == y.cols);
+        int mrows = m.rows;
+        int mcols = m.cols;
+        for (int r = 0; r < mrows; ++r) {
+            for (int c = 0; c < mcols; ++c) {
+                y.data[r][c] = m.data[r][c] * k;
+            } //for col
+        } //for row
+    }
+
+
+    public static void matrixConcatenate(Matrix ma, Matrix mb, Matrix mc, int dim) {
+        assert(dim == 0 || dim == 1);
+        assert(ma != null);
+        assert(mb != null);
+        assert(mc != null);
+
+        int offsetmbRows;
+        int offsetmbCols;
+        if(dim == 0) {
+            assert(ma.cols == mb.cols);
+            assert(ma.cols == mc.cols);
+            assert(mc.rows == ma.rows+mb.rows);
+            offsetmbRows = ma.rows;
+            offsetmbCols = 0;
+        } else {
+            assert(ma.rows == mb.rows);
+            assert(ma.rows == mc.rows);
+            assert(mc.cols == ma.cols+mb.cols);
+            offsetmbRows = 0;
+            offsetmbCols = ma.cols;
+        }
+
+        for (int r = 0; r < ma.rows; ++r) {
+            for (int c = 0; c < ma.cols; ++c) {
+                mc.data[r][c] = ma.data[r][c];
+            }
+        }
+        for (int r = 0; r < mb.rows; ++r) {
+            for (int c = 0; c < mb.cols; ++c) {
+                mc.data[r+offsetmbRows][c+offsetmbCols] = mb.data[r][c];
+            }
+        }
     }
 
     public static void matrixMultiplyByTranspose(Matrix ma,
@@ -290,4 +392,3 @@ public class Matrix {
         }
     }
 }
-

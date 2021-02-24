@@ -67,6 +67,8 @@ public class KalmanFilterTest {
                    0,  0,  0,  0,
                    0,  0,  0,  0);
 
+        // Test1
+
         // Inputs
         Matrix Uk = new Matrix(2,1);
         double[][] u = {{ 0.04148839,  0.00676059,  0.00710022,  0.03073782, -0.05194414,
@@ -131,30 +133,95 @@ public class KalmanFilterTest {
                 { 0.55662069,  1.11417262, -0.20497093, -0.05223005}};
 
         // Instantiate
-        KalmanFilter kalmanFilter = new KalmanFilter(A, B, H, Q, R, x0, P0);
+        KalmanFilter kalmanFilter;
+        try{
+            kalmanFilter = new KalmanFilter(A, B, H, Q, R, x0, P0, dt);
 
-        // Storage allocation for results
-        double[][] estPred = new double[n][4];
-        double[][] estState = new double[n][4];
+            // Storage allocation for results
+            double[][] estPred = new double[n][4];
+            double[][] estState = new double[n][4];
 
-        for(int i = 0; i<n; i++) {
-            Uk.setData(u[0][i], u[1][i]);
-            kalmanFilter.predict(Uk);
-            estPred[i] = kalmanFilter.getState();
-            Zk.setData(z[0][i], z[1][i]);
-            kalmanFilter.update(Zk);
-            estState[i] = kalmanFilter.getState();
-        }
-
-        // Assert
-        for(int i=0; i<n; i++) {
-            for(int j=0; j<4; j++) {
-                assertEquals("KalmanFilter error in prediction " + i +" state " + j,
-                        targetEstPred[i][j], estPred[i][j], 1e-5f);
-                assertEquals("KalmanFilter error in update " + i +" state " + j,
-                        targetEstState[i][j], estState[i][j], 1e-5f);
+            for(int i = 0; i<n; i++) {
+                Uk.setData(u[0][i], u[1][i]);
+                kalmanFilter.predict(Uk);
+                estPred[i] = kalmanFilter.getState();
+                Zk.setData(z[0][i], z[1][i]);
+                try {
+                    kalmanFilter.update(Zk);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                estState[i] = kalmanFilter.getState();
             }
+
+            // Assert
+            for(int i=0; i<n; i++) {
+                for(int j=0; j<4; j++) {
+                    assertEquals("KalmanFilter error in prediction " + i +" state " + j,
+                            targetEstPred[i][j], estPred[i][j], 1e-5f);
+                    assertEquals("KalmanFilter error in update " + i +" state " + j,
+                            targetEstState[i][j], estState[i][j], 1e-5f);
+                }
+            }
+        }catch(Exception e){
+            e.printStackTrace();
         }
 
+        // Test 2
+
+        // target data for run with GPS update 0,4,8...
+        double[][] targetProcState =     {{ 0.62944622,  1.17899486,  6.29446216, 11.78994862},
+                { 0.64320065,  1.1938317,   0.1375443,   0.14836835},
+                { 0.66380107,  1.20392799,  0.20600423,  0.10096289},
+                { 0.69136737,  1.20984175,  0.27566303,  0.0591376 },
+                { 0.72560433,  1.21152077,  0.34236961,  0.01679026},
+                { 0.74383562,  1.21611708,  0.18231287,  0.04596306},
+                { 0.75455302,  1.21006858,  0.10717397, -0.06048498},
+                { 0.75832196,  1.19370466,  0.03768946, -0.16363919},
+                { 0.75509952,  1.16763435, -0.03222445, -0.26070311},
+                { 0.75646987,  1.15836243,  0.01370353, -0.09271917},
+                { 0.7454111,   1.14970881, -0.11058766, -0.08653621},
+                { 0.72348849,  1.14304959, -0.21922614, -0.06659224},
+                { 0.6903775,   1.13916301, -0.33110991, -0.03886579},
+                { 0.67815021,  1.13421196, -0.1222729,  -0.04951048},
+                { 0.65942038,  1.12994258, -0.18729834, -0.04269383},
+                { 0.63480394,  1.12652753, -0.24616439, -0.03415053},
+                { 0.60526479,  1.12495203, -0.29539149, -0.01575496},
+                { 0.,          0.,          0.,          0.        },
+                { 0.,          0.,          0.,          0.        },
+                { 0.,          0.,          0.,          0.        }};
+
+        try{
+            KalmanFilter kalmanFilter2 = new KalmanFilter(A, B, H, Q, R, x0, P0, 0.1);
+
+            double[][] estProc = new double[n][4];
+            double[][] updatedInterval;
+
+            for(int i = 0; i<n; i++) {
+                Uk.setData(u[0][i], u[1][i]);
+                kalmanFilter2.predict(Uk);
+                Zk.setData(z[0][i], z[1][i]);
+
+                if (i%4 == 0) {  // in this particular test gps update only every 4 samples
+                    updatedInterval = kalmanFilter2.updateAndGetResults(Zk);
+                    // copy solution
+                    for(int p=0; p<updatedInterval.length; p++) {
+                        for(int m=0; m<updatedInterval[0].length; m++) {
+                            estProc[m+i-updatedInterval[0].length+1][p] = updatedInterval[p][m];  // Note: Transposition
+                        }
+                    }
+                }
+            }
+
+            // Assert
+            for(int i=0; i<n; i++) {
+                for(int j=0; j<4; j++) {
+                    assertEquals("KalmanFilter error in processing " + i +" state " + j,
+                            targetProcState[i][j], estProc[i][j], 1e-5f);
+                }
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 }

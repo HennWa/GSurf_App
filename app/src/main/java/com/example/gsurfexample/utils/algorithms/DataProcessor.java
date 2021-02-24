@@ -84,6 +84,30 @@ public class DataProcessor {
                 + " DdZ: " + Float.toString(globalAccelerations[2]));
 
 
+        // Sensor fusion with KalmanFilter
+        /*
+        if(k in index_GPS):
+        GPS_updated = True
+        else:
+        GPS_updated = False
+
+        kalman_filter.predict(u[:,k])
+        (x_pred, P_pred) = kalman_filter.get_state()
+
+        if(GPS_updated):
+        kalman_filter.update(meas[:, k])
+        (x, P) = kalman_filter.get_state()
+
+        est_state[k, :] = x
+        est_pred[k, :] = x_pred
+        est_cov[k, ...] = P
+
+                (x_hat, x_hat2) = kalmanIntervalPostCorrector.correctKalmanResultsInInterval(x, GPS_updated,
+                kalman_filter.getDelta(),
+                u[:,k])    # */
+
+
+
         // Calculate global velocity and global position from acceleration
         float[] globalVelocities = integratorAcceleration.cumTrapzIntegration(globalAccelerations);
         float[] globalPosition = integratorVelocities.cumTrapzIntegration(globalVelocities);
