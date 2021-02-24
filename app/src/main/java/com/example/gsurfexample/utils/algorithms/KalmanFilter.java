@@ -41,9 +41,8 @@ public class KalmanFilter {
     /*auxiliary matrices for interval update*/
     private int count; // counting interval length without update
     private final double dt; // constant sample rate
-    private final int maxIntDataLength; // maximal Storage size
-    private Matrix IntData; //storage for states in interval without update
-    private Matrix LastStateOfLastInterval; // storage for last state of last interval
+    private final Matrix IntData; //storage for states in interval without update
+    private final Matrix LastStateOfLastInterval; // storage for last state of last interval
     //used for velocity calculation
 
     /**
@@ -65,7 +64,8 @@ public class KalmanFilter {
     public KalmanFilter(Matrix A, Matrix B, Matrix H, Matrix Q,
                         Matrix R, Matrix x0, Matrix P0, double dt) throws Exception{
 
-        maxIntDataLength = 20;
+        // maximal Storage size
+        int maxIntDataLength = 20;
 
         int n = A.shape()[0];
         int v = H.shape()[0];
@@ -124,7 +124,7 @@ public class KalmanFilter {
         this.auxSDxMD = new Matrix(stateDimension, measureDimension);
         this.KYk = new Matrix(stateDimension, 1);
 
-        this.IntData = new Matrix(stateDimension, this.maxIntDataLength);
+        this.IntData = new Matrix(stateDimension, maxIntDataLength);
         this.LastStateOfLastInterval = new Matrix(stateDimension,1);
     }
 
