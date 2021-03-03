@@ -1,12 +1,13 @@
 package com.example.gsurfexample.utils.algorithms;
 
-
 import android.util.Log;
 
 import com.example.gsurfexample.source.local.live.ProcessedData;
 import com.example.gsurfexample.source.local.live.TimeSample;
+import com.example.gsurfexample.utils.other.GlobalParams;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 /**
  * Data Processor provides function processTimeSample which takes a TimeSample and
@@ -20,28 +21,40 @@ import java.lang.reflect.Array;
  */
 public class DataProcessor {
 
-    private final float SAMPLEPERIOD;               // Sample period
-    private final float CUTOFF;                     // Cutoff frequency of Butterworth filter
-    private final float BETAMADGWICK;               // Parameter of Madgwick algorithm
+    private int intervalStepCount;
+    private int sampleCount;
+    private final ArrayList<ProcessedData> processedDataCache;
 
     private MadgwickAHRS madgwickAHRS;              // Sensor fusion algorithm
-    private Integrator integratorAcceleration;      // Integrator for integrating accelerations
-    private Integrator integratorVelocities;        // Integrator for integrating velocities
+    private KalmanFilter kalmanFilter;              // KalmanFilter for sensor fusion
+
+    private final Matrix Uk;                              // Input matrix for sensor fusion
+    private final Matrix Zk;                              // Measurement (GPS) matrix for sensor fusion
+    private double[] lastGPSLoc;                      // last timeSample for GPS values comparison
+    private boolean newInterval;
+
 
     /**
-     * Constructor initializes Madgwick filter, highpass filter and Integretors.
-     * @param samplePeriod   [s] Sample period of TimeSamples.
-     * @param cutoff [Hz] Cutoff frequncy of highpass filter.
-     * @param betaMadgwick [-] Tuning parameter of Madgwick filter.
+     * Constructor initializes Madgwick filter, highpass filter and Kalman Filter.
      */
-    public DataProcessor(float samplePeriod, float cutoff, float betaMadgwick) {
-        SAMPLEPERIOD = samplePeriod;
-        CUTOFF = cutoff;
-        BETAMADGWICK = betaMadgwick;
+    public DataProcessor() {
 
-        madgwickAHRS = new MadgwickAHRS(SAMPLEPERIOD, BETAMADGWICK);
-        integratorAcceleration = new Integrator(SAMPLEPERIOD);
-        integratorVelocities = new Integrator(SAMPLEPERIOD);
+        GlobalParams globalParams = GlobalParams.getInstance(); // get singleton
+        sampleCount = 0;
+        lastGPSLoc = new double[]{0, 0};
+        Uk = new Matrix(2,1);
+        Zk = new Matrix(2,1);
+        newInterval = false;
+        processedDataCache = new ArrayList<>();
+
+        try {
+            madgwickAHRS = new MadgwickAHRS(globalParams.sampleRs, globalParams.betaMadgwick);
+            kalmanFilter = new KalmanFilter(globalParams.getA(), globalParams.getB(), globalParams.getH(),
+                    globalParams.getQ(), globalParams.getR(), globalParams.getX0(), globalParams.getP0(),
+                    globalParams.sampleRs);
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -54,79 +67,110 @@ public class DataProcessor {
      * - highpass filtering of z position.
      *
      * @param timeSample to process.
-     * @return Processed data or null since processing steps need to collect timeSamples
+     * @return List of processed data or null since processing steps need to collect timeSamples
      *          over certain period.
-     *
      */
-    public ProcessedData processTimeSample(TimeSample timeSample){
+    public ArrayList<ProcessedData> processTimeSample(TimeSample timeSample){
 
-        // Data processing
-        // Madgwick algorithm to calculate quaternion
+        // Treat cases
+        if(lastGPSLoc[0] == 0 || lastGPSLoc[1] == 0){      // wait for GPS, skip first sample
+            lastGPSLoc[0] = timeSample.getLon();
+            lastGPSLoc[1] = timeSample.getLat();
+            return null;
+        }
+        if (newInterval){
+            processedDataCache.clear(); // Empty cache
+            newInterval = false;
+        }
+        if(sampleCount==0){
+            kalmanFilter.Xk_k.setData(SphericalMercator.lon2x(timeSample.getLon()),
+                    SphericalMercator.lat2y(timeSample.getLat()), 0, 0);
+        }
+        sampleCount += 1;
+
+        // Step1: Madgwick algorithm to calculate quaternion
         madgwickAHRS.update( timeSample.getWx(),   timeSample.getWy(),  timeSample.getWz(),
-                            timeSample.getDdx(),  timeSample.getDdy(), timeSample.getDdz(),
+                            timeSample.getGFx(),  timeSample.getGFy(), timeSample.getGFz(),
                              timeSample.getBx(),   timeSample.getBy(),  timeSample.getBz());
 
-        // Calculate global acceleration
         // Quaternion Object Java: (x,y,z,p) [same as in Scipy.Rotation], but result from madgwick(p,x,y,z)
         Quaternion quaternion = new Quaternion(Array.getFloat(madgwickAHRS.getQuaternion(), 1),
                                                 Array.getFloat(madgwickAHRS.getQuaternion(), 2),
                                                 Array.getFloat(madgwickAHRS.getQuaternion(), 3),
                                                 Array.getFloat(madgwickAHRS.getQuaternion(), 0));
 
+        // Step2: Calculate global acceleration (from Linear Acceleration Sensor)
         float[] globalAccelerations = quaternion.rotateVector(new float[] {timeSample.getDdx(),
                                                     timeSample.getDdy(), timeSample.getDdz()});
 
-        Log.i("DATAPROCESSOR", "Into Processing Ddx: " + Float.toString(timeSample.getDdx())
-                + " Ddy: " + Float.toString(timeSample.getDdy())
-                + " Ddz: " + Float.toString(timeSample.getDdz()));
-        Log.i("DATAPROCESSOR", "Calculated DdX: " + Float.toString(globalAccelerations[0])
-                + " DdY: " + Float.toString(globalAccelerations[1])
-                + " DdZ: " + Float.toString(globalAccelerations[2]));
-
-
-        // Sensor fusion with KalmanFilter
-        /*
-        if(k in index_GPS):
-        GPS_updated = True
-        else:
-        GPS_updated = False
-
-        kalman_filter.predict(u[:,k])
-        (x_pred, P_pred) = kalman_filter.get_state()
-
-        if(GPS_updated):
-        kalman_filter.update(meas[:, k])
-        (x, P) = kalman_filter.get_state()
-
-        est_state[k, :] = x
-        est_pred[k, :] = x_pred
-        est_cov[k, ...] = P
-
-                (x_hat, x_hat2) = kalmanIntervalPostCorrector.correctKalmanResultsInInterval(x, GPS_updated,
-                kalman_filter.getDelta(),
-                u[:,k])    # */
-
-
-
-        // Calculate global velocity and global position from acceleration
-        float[] globalVelocities = integratorAcceleration.cumTrapzIntegration(globalAccelerations);
-        float[] globalPosition = integratorVelocities.cumTrapzIntegration(globalVelocities);
-
-        // High-pass-filter for Z direction
-
-
-        // Store in object
-        int id = 0;        // here real session id
-        ProcessedData processedData = new ProcessedData(id, timeSample.getTimeStamp(),
+        // Copy results of this sample as available here
+        processedDataCache.add(new ProcessedData(1, timeSample.getTimeStamp(),
                 globalAccelerations[0], globalAccelerations[1], globalAccelerations[2],
-                globalVelocities[0], globalVelocities[1], globalVelocities[2],
-                globalPosition[0], globalPosition[1], globalPosition[2],
-                0.1f, 0.1f, 0.1f,
+                0f, 0f, 0f, 0f, 0f, 0f,   // from later processing steps
                 timeSample.getWx(), timeSample.getWy(), timeSample.getWz(),
                 quaternion.getX(), quaternion.getY(), quaternion.getZ(), quaternion.getW(), // w value of quaternion according to python scipy convention (different from Madgwick)
-                0.1f, 0.1f);
+                (float)timeSample.getLat(), (float)timeSample.getLon(), 1));
 
-        return processedData;
+
+        // Step 3: High-pass-filter for Z direction
+        // Integrator for integrating accelerations
+        //Integrator integratorAcceleration = new Integrator(SAMPLEPERIOD);
+        // Integrator for integrating velocities
+        //Integrator integratorVelocities = new Integrator(SAMPLEPERIOD);
+        //float[] globalVelocities = integratorAcceleration.cumTrapzIntegration(globalAccelerations);
+        //float[] globalPosition = integratorVelocities.cumTrapzIntegration(globalVelocities);
+        //...
+
+
+        // Step 4: Sensor fusion with KalmanFilter
+        // (global accelerations + GPS -> X, Y, Z, dX, dY, dZ
+        try {
+            Uk.setData(globalAccelerations[0], globalAccelerations[1]);
+            kalmanFilter.predict(Uk);
+
+            if((timeSample.getLon() !=  lastGPSLoc[0]) ||
+                    (timeSample.getLat() !=  lastGPSLoc[1]) ||
+                    intervalStepCount >= GlobalParams.maxIntervalLength-1){
+
+                intervalStepCount = 0;
+                lastGPSLoc[0] = timeSample.getLon();
+                lastGPSLoc[1] = timeSample.getLat();
+
+                Zk.setData(SphericalMercator.lon2x(timeSample.getLon()),
+                            SphericalMercator.lat2y(timeSample.getLat()));
+
+
+                //Log.i("DataProcessor",  " lon "+ SphericalMercator.lon2x(timeSample.getLon()));
+
+
+                // Storage for results from kalman filtering
+                double[][] updatedInterval = kalmanFilter.updateAndGetResults(Zk);  // size: states X number of samples
+
+                // Copy results to cache
+                for(int m = 0; m< updatedInterval[0].length; m++) {
+
+
+                    Log.i("DataProcessor", "UpdatedInterval  "+ m + "    " + updatedInterval[0][m]);
+
+
+
+                    processedDataCache.get(m).setX((float) updatedInterval[0][m]);
+                    processedDataCache.get(m).setY((float) updatedInterval[1][m]);
+                    processedDataCache.get(m).setdX((float) updatedInterval[2][m]);
+                    processedDataCache.get(m).setdY((float) updatedInterval[3][m]);
+                }
+                newInterval = true;
+                return processedDataCache;
+            }
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        //Log.i("DataProcessor", "Counter "+ intervalStepCount);
+        // Increment counter of interval steps and processed time samples
+        intervalStepCount += 1;
+        sampleCount += 1;
+
+        return null;
     }
-
 }

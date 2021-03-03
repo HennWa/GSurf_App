@@ -1,5 +1,7 @@
 package com.example.gsurfexample.utils.algorithms;
 
+import com.example.gsurfexample.utils.other.GlobalParams;
+
 /**
  * KalmanFilter class. Taken from GitHub
  *
@@ -65,7 +67,7 @@ public class KalmanFilter {
                         Matrix R, Matrix x0, Matrix P0, double dt) throws Exception{
 
         // maximal Storage size
-        int maxIntDataLength = 20;
+        int maxIntDataLength = GlobalParams.maxIntervalLength;
 
         int n = A.shape()[0];
         int v = H.shape()[0];
@@ -217,14 +219,16 @@ public class KalmanFilter {
         // Calculate deviation Coefficients for quadratic correction (delta = 1/2 c dt^2)
         double dtUpdate = this.count * this.dt;
         Matrix delta = new Matrix(2, 1);  // Correct X, Y
-        Matrix.matrixSubtract(this.Xk_km1.getSubMatrix(0, 1, 0, 0), this.Xk_k.getSubMatrix(0, 1, 0, 0), delta);
+        Matrix.matrixSubtract(this.Xk_km1.getSubMatrix(0, 1, 0, 0),
+                this.Xk_k.getSubMatrix(0, 1, 0, 0), delta);
 
         Matrix devCoef = new Matrix(2, 1);
         Matrix.matrixMultiply(2/(dtUpdate*dtUpdate), delta, devCoef);  // shape n x 1
 
         //Calculate updated interval data of position
         double[] helperTimesWeights_ = new double[this.count];
-        for (int i=0; i<this.count-1; ++i){helperTimesWeights_[i] = 0.5 * ((i+1)*this.dt)*((i+1)*this.dt);} // note: last entry = 0
+        for (int i=0; i<this.count-1; ++i){helperTimesWeights_[i] =
+                0.5 * ((i+1)*this.dt)*((i+1)*this.dt);} // note: last entry = 0
         Matrix TimesWeights = new Matrix(1, this.count);
         TimesWeights.setData(helperTimesWeights_);
 
@@ -232,11 +236,13 @@ public class KalmanFilter {
         Matrix.matrixMultiply(devCoef, TimesWeights, devEstimation);
 
         Matrix Xi_hatPos = new Matrix(2, this.count);
-        Matrix.matrixSubtract(IntData.getSubMatrix(0, 1, 0, this.count-1), devEstimation, Xi_hatPos);
+        Matrix.matrixSubtract(IntData.getSubMatrix(0, 1, 0,
+                this.count-1), devEstimation, Xi_hatPos);
 
         //Calculate updated interval data of velocity
         Matrix Xi_hatPosExt = new Matrix(2,this.count+1);
-        Matrix.matrixConcatenate(this.LastStateOfLastInterval.getSubMatrix(0, 1, 0, 0), Xi_hatPos, Xi_hatPosExt, 1);
+        Matrix.matrixConcatenate(this.LastStateOfLastInterval.getSubMatrix(0, 1,
+                0, 0), Xi_hatPos, Xi_hatPosExt, 1);
         Matrix Xi_hatVel = new Matrix(2,this.count);
         Matrix.matrixSubtract(Xi_hatPosExt.getSubMatrix(0, 1, 1, this.count),
                 Xi_hatPosExt.getSubMatrix(0, 1, 0, this.count-1), Xi_hatVel); // Diff operation

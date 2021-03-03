@@ -8,14 +8,24 @@ public class TimeSample {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
-    private long timeStamp;
-    private float ddx, ddy, ddz;
-    private float gFx, gFy, gFz;
-    private float Bx, By, Bz;
-    private float wx, wy, wz;
-    private double lat, lon, height;
-    private double xGPS, yGPS;
-
+    private final long timeStamp;
+    private final float ddx;
+    private final float ddy;
+    private final float ddz;
+    private final float gFx;
+    private final float gFy;
+    private final float gFz;
+    private final float Bx;
+    private final float By;
+    private final float Bz;
+    private final float wx;
+    private final float wy;
+    private final float wz;
+    private final double lat;
+    private final double lon;
+    private final double height;
+    private final double xGPS;
+    private final double yGPS;
 
     public TimeSample(long timeStamp, float ddx, float ddy, float ddz,   // must be like that due to ROOM
                       float gFx, float gFy, float gFz,
@@ -38,11 +48,11 @@ public class TimeSample {
         this.wx = wx;
         this.wy = wy;
         this.wz = wz;
-        this.lat = 0;
-        this.lon = 0;
-        this.height = 0;
-        this.xGPS = 0;
-        this.yGPS = 0;
+        this.lat = lat;
+        this.lon = lon;
+        this.height = height;
+        this.xGPS = lat;
+        this.yGPS = lon;
     }
 
     public void setId(int id) {

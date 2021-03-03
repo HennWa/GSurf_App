@@ -13,6 +13,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ArchitectureExample">
+        <activity
+            android:name="com.example.gsurfexample.ui.SplashActivity"
+            android:theme="@style/AppTheme.SplashScreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name="com.example.gsurfexample.ui.AddEditNoteActivity"
             android:parentActivityName="com.example.gsurfexample.ui.MainActivity"/>
         <activity android:name="com.example.gsurfexample.ui.TestActivity"

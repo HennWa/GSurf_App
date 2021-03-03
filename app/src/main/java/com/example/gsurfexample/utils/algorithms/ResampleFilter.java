@@ -1,5 +1,6 @@
 package com.example.gsurfexample.utils.algorithms;
 
+import android.util.Log;
 
 import com.example.gsurfexample.source.local.live.TimeSample;
 
@@ -23,8 +24,7 @@ public class ResampleFilter{
     private float meanWx, meanWy, meanWz;
     private float meanLat, meanLon, meanHeight;
     private float meanXGPS, meanYGPS;
-    private TimeSample resampledTimeSampleData;
-    private List<TimeSample> filterCache;
+    private final List<TimeSample> filterCache;
 
     /**
      * Constructor.
@@ -43,8 +43,6 @@ public class ResampleFilter{
         filterCache = new ArrayList<>();
     }
 
-
-
     // Methods
     /**
      * Takes a new TimeSample into a list and carries out resampling.
@@ -57,21 +55,22 @@ public class ResampleFilter{
             nextSampleTime = filterCache.get(0).getTimeStamp() + sampleRate;
         }
 
+        TimeSample resampledTimeSampleData;
         if(timeSample.getTimeStamp() > nextSampleTime){
             int numElem = filterCache.size();
             for(int i = 0; i < numElem-1; i++){
-                meanDdx += (float) filterCache.get(0).getDdx();
-                meanDdy += (float) filterCache.get(0).getDdy();
-                meanDdz += (float) filterCache.get(0).getDdz();
-                meanGFx += (float) filterCache.get(0).getGFx();
-                meanGFy += (float) filterCache.get(0).getGFy();
-                meanGFz += (float) filterCache.get(0).getGFz();
-                meanBx += (float) filterCache.get(0).getBx();
-                meanBy += (float) filterCache.get(0).getBy();
-                meanBz += (float) filterCache.get(0).getBz();
-                meanWx += (float) filterCache.get(0).getWx();
-                meanWy += (float) filterCache.get(0).getWy();
-                meanWz += (float) filterCache.get(0).getWz();
+                meanDdx += filterCache.get(0).getDdx();
+                meanDdy += filterCache.get(0).getDdy();
+                meanDdz += filterCache.get(0).getDdz();
+                meanGFx += filterCache.get(0).getGFx();
+                meanGFy += filterCache.get(0).getGFy();
+                meanGFz += filterCache.get(0).getGFz();
+                meanBx += filterCache.get(0).getBx();
+                meanBy += filterCache.get(0).getBy();
+                meanBz += filterCache.get(0).getBz();
+                meanWx += filterCache.get(0).getWx();
+                meanWy += filterCache.get(0).getWy();
+                meanWz += filterCache.get(0).getWz();
                 meanLat += (float) filterCache.get(0).getLat();
                 meanLon += (float) filterCache.get(0).getLon();
                 meanHeight += (float) filterCache.get(0).getHeight();
@@ -96,6 +95,7 @@ public class ResampleFilter{
             meanHeight /= (numElem-1);
             meanXGPS /= (numElem-1);
             meanYGPS /= (numElem-1);
+
 
             resampledTimeSampleData = new TimeSample( nextSampleTime-sampleRate/2,
                                                                 meanDdx, meanDdy, meanDdz,

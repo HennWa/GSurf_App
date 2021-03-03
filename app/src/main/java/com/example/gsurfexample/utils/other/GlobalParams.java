@@ -7,20 +7,28 @@ public class GlobalParams {
     private static GlobalParams instance;
 
     // ResampleFilter
-    private final long sampleR = 100;
+    public static final long sampleR = 100;  // [ms]
+    public static final float sampleRs = sampleR/1e3f;  // [s]
+
+    // Madgwick algorithm
+    public static final float betaMadgwick = 0.1f; // [-]
+
+    // Highpass filter
+    //public static final float cutoff = 0.1f; // [Hz]
 
     // KalmanFilter
     double dt = (double)sampleR/1000;
     double s2_x = 70*70;
     double s2_y = 70*70;
     double lambda2 = 10*10;
-    Matrix A = new Matrix(4,4);
-    Matrix B = new Matrix(4,2);
-    Matrix Q = new Matrix(4,4);
-    Matrix H = new Matrix(2,4);
-    Matrix R = new Matrix(2,2);
-    Matrix x0 = new Matrix(4,1);
-    Matrix P0 = new Matrix(4,4);
+    public static final int maxIntervalLength = 20;
+    public static Matrix A = new Matrix(4,4);
+    public static Matrix B = new Matrix(4,2);
+    public static Matrix Q = new Matrix(4,4);
+    public static Matrix H = new Matrix(2,4);
+    public static Matrix R = new Matrix(2,2);
+    public static Matrix x0 = new Matrix(4,1);
+    public static Matrix P0 = new Matrix(4,4);
 
     // Singleton class
     public static GlobalParams getInstance() {
@@ -71,39 +79,32 @@ public class GlobalParams {
                    0,  0,  0,  0);
     }
 
-    // Getter
-    public long getSampleR() {
-        return sampleR;
-    }
-
-    public Matrix getA() {
+    public static Matrix getA() {
         return A;
     }
 
-    /*
-
-    public Matrix getB() {
+    public static Matrix getB() {
         return B;
     }
 
-    public Matrix getQ() {
+    public static Matrix getQ() {
         return Q;
     }
 
-    public Matrix getH() {
+    public static Matrix getH() {
         return H;
     }
 
-    public Matrix getR() {
+    public static Matrix getR() {
         return R;
     }
 
-    public Matrix getX0() {
+    public static Matrix getX0() {
         return x0;
     }
 
-    public Matrix getP0() {
+    public static Matrix getP0() {
         return P0;
-    } */
+    }
 
 }

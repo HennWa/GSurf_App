@@ -106,12 +106,12 @@ public class TestActivity extends AppCompatActivity {
             public void onChanged(@Nullable ProcessedData processedData) {
 
                 if (processedData != null) {
-                    xValue.setText("xValue: " + (float) processedData.getDdX());
+                    xValue.setText("xValue: " + (float) processedData.getX());
 
                     // add value to chart
                     if(plotData) {
 
-                        addChartEntry((float) processedData.getDdX());
+                        addChartEntry((float) processedData.getX());
                         //addChartEntry(1);
                         plotData();
                     }

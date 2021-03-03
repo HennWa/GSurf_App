@@ -8,7 +8,7 @@ public class Integrator {
     boolean start;
 
     public Integrator(float samplePeriod) {
-        this.samplePeriod = samplePeriod;   // not used yet
+        this.samplePeriod = samplePeriod;
         this.cumtrapz = new float[3];
         this.lastSample = new float[3];
         this.start = true;
