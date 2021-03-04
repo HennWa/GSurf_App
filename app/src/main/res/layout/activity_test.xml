@@ -1,32 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_test2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|end"
-        android:layout_margin="32dp"/>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_test3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_margin="32dp"/>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_stop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_margin="32dp"
-        app:rippleColor="@color/purple_200"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -51,11 +29,47 @@
     </LinearLayout>
 
     <com.github.mikephil.charting.charts.LineChart
-        android:layout_width="match_parent"
+        android:id="@+id/chartX"
+        android:layout_width="400dp"
         android:layout_height="250sp"
-        android:layout_marginTop="200dp"
-        android:id="@+id/chartX"></com.github.mikephil.charting.charts.LineChart>
+        android:layout_marginTop="30dp"></com.github.mikephil.charting.charts.LineChart>
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/chartTeta"
+        android:layout_width="400dp"
+        android:layout_height="250sp"
+       android:layout_below="@id/chartX"></com.github.mikephil.charting.charts.LineChart>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/ButtonLayout"
+        android:layout_alignParentBottom="true">
 
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_test3"
+            android:layout_marginLeft="80dp"
+            android:layout_alignRight="@id/button_test2"
+            android:layout_width="80dp"
+            android:layout_height="50dp"/>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_test2"
+            android:layout_marginLeft="40dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:backgroundTint="@color/dark_orange"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_stop"
+            android:layout_marginLeft="40dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:rippleColor="@color/purple_200"
+            android:backgroundTint="@color/dark_purple"/>
+    </LinearLayout>
+
+
+</RelativeLayout>

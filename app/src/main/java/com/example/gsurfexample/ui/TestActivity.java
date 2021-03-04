@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.gsurfexample.R;
 import com.example.gsurfexample.source.local.live.ProcessedData;
+import com.example.gsurfexample.utils.algorithms.Quaternion;
 import com.example.gsurfexample.utils.factory.ProcessedDataViewModelFactory;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.YAxis;
@@ -27,6 +28,8 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.lang.reflect.Array;
+
 public class TestActivity extends AppCompatActivity {
 
     private ProcessedDataViewModel processedDataViewModel;
@@ -35,6 +38,7 @@ public class TestActivity extends AppCompatActivity {
 
     // For plot
     private LineChart mChart;
+    private LineChart mChartTeta;
     Thread thread;
     boolean plotData = false;
 
@@ -63,6 +67,19 @@ public class TestActivity extends AppCompatActivity {
         LineData data = new LineData();
         data.setValueTextColor(Color.WHITE);
         mChart.setData(data);
+
+        mChartTeta = (LineChart) findViewById(R.id.chartTeta);
+        mChartTeta.getDescription().setEnabled(true);
+        mChartTeta.getDescription().setText("Orientation");
+        mChartTeta.setTouchEnabled(false);
+        mChartTeta.setDragEnabled(false);
+        mChartTeta.setScaleEnabled(false);
+        mChartTeta.setPinchZoom(false);
+        mChartTeta.setBackgroundColor(Color.WHITE);
+        LineData data2 = new LineData();
+        data2.setValueTextColor(Color.WHITE);
+        mChartTeta.setData(data2);
+
 
         // start thread for frame control of plot
         //startPlot();
@@ -112,8 +129,14 @@ public class TestActivity extends AppCompatActivity {
                     if(plotData) {
 
                         addChartEntry((float) processedData.getX());
+
+                        // Caluclate angle from quaternion
+                        Quaternion quaternion = new Quaternion(processedData.getQ0(),
+                                processedData.getQ1(), processedData.getQ2(), processedData.getQ3());
+                        addChartEntry2((float)(quaternion.toEulerAngles()[1]/Math.PI*180));
                         //addChartEntry(1);
                         plotData();
+                        plotData2();
                     }
                     plotData = false;
                 }
@@ -191,6 +214,19 @@ public class TestActivity extends AppCompatActivity {
         }
     }
 
+    private void addChartEntry2(float entry){
+        LineData data2 = mChartTeta.getData();
+
+        if(data2 !=null){
+            ILineDataSet set2 = data2.getDataSetByIndex(0);
+            if(set2==null){
+                set2 = createSet();
+                data2.addDataSet(set2);
+            }
+            data2.addEntry(new Entry( set2.getEntryCount(), entry), 0);
+        }
+    }
+
     private void plotData(){
         LineData data = mChart.getData();
 
@@ -206,6 +242,25 @@ public class TestActivity extends AppCompatActivity {
             mChart.moveViewToX(data.getEntryCount());
             // do not forget to invalidate()
             mChart.invalidate();
+            plotData = false;
+        }
+    }
+
+    private void plotData2(){
+        LineData data2 = mChartTeta.getData();
+
+        if(data2 !=null){
+            data2.notifyDataChanged();
+            mChartTeta.notifyDataSetChanged();   // both for data update necessary
+
+            //sets the visible number in the chart at first view to 5
+            mChartTeta.setVisibleXRangeMaximum(300);
+            // enables drag to left/right
+            mChartTeta.setDragEnabled(true);
+            // moves chart to the latest entry
+            mChartTeta.moveViewToX(data2.getEntryCount());
+            // do not forget to invalidate()
+            mChartTeta.invalidate();
             plotData = false;
         }
     }

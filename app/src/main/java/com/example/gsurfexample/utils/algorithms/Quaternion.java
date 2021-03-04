@@ -3,10 +3,10 @@ package com.example.gsurfexample.utils.algorithms;
 
 public class Quaternion {
 
-    private float x;
-    private float y;
-    private float z;
-    private float w;
+    private final float x;
+    private final float y;
+    private final float z;
+    private final float w;
 
     public Quaternion(float x, float y, float z, float w) {
         this.x = x;
@@ -73,6 +73,28 @@ public class Quaternion {
         return res;
     }
 
+    public float[] toEulerAngles() {
+        float pitch, yaw, roll;
+
+        roll = (float)Math.atan2(-2*( y*z - w*x), w*w - x*x - y*y + z*z);
+        pitch = (float)Math.asin(2*( x*z + w*y));
+        yaw = (float)Math.atan2(-2*( x*y - w*z), w*w + x*x - y*y - z*z);
+
+        /* Alte methode passt nicht zu Scipy
+        float pitch = (float)Math.asin(2 * x * y + 2 * w * z);
+        if(Math.abs(x * y + z * w - 0.5) < 1e-8){
+            roll = 0;
+            yaw = 2 * (float)Math.atan2(x, w);
+        }else if(Math.abs(x * y + z * w + 0.5) < 1e-8){
+            roll = -2 * (float)Math.atan2(x, w);
+            yaw = 0;
+        }else{
+        roll = (float)Math.atan2(2 * w * x - 2 * y * z, 1 - 2 * x * x - 2 * z * z);
+        yaw = (float)Math.atan2(2 * w * y - 2 * x * z, 1 - 2 * y * y - 2 * z * z);
+        } */
+
+        return new float[]{pitch, roll, yaw};
+    }
 }
 
 
