@@ -30,7 +30,7 @@ public class DataProcessor {
 
     private final Matrix Uk;                              // Input matrix for sensor fusion
     private final Matrix Zk;                              // Measurement (GPS) matrix for sensor fusion
-    private double[] lastGPSLoc;                      // last timeSample for GPS values comparison
+    private final double[] lastGPSLoc;                      // last timeSample for GPS values comparison
     private boolean newInterval;
 
 
@@ -127,7 +127,6 @@ public class DataProcessor {
         try {
             Uk.setData(globalAccelerations[0], globalAccelerations[1]);
             kalmanFilter.predict(Uk);
-
             if((timeSample.getLon() !=  lastGPSLoc[0]) ||
                     (timeSample.getLat() !=  lastGPSLoc[1]) ||
                     intervalStepCount >= GlobalParams.maxIntervalLength-1){
@@ -150,7 +149,7 @@ public class DataProcessor {
                 for(int m = 0; m< updatedInterval[0].length; m++) {
 
 
-                    Log.i("DataProcessor", "UpdatedInterval  "+ m + "    " + updatedInterval[0][m]);
+                    //Log.i("DataProcessor", "UpdatedInterval  "+ m + "    " + updatedInterval[0][m]);
 
 
 

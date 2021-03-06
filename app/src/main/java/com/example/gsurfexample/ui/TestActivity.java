@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -18,17 +19,24 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.gsurfexample.R;
 import com.example.gsurfexample.source.local.live.ProcessedData;
+import com.example.gsurfexample.source.local.live.TimeSample;
 import com.example.gsurfexample.utils.algorithms.Quaternion;
 import com.example.gsurfexample.utils.factory.ProcessedDataViewModelFactory;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.ScatterChart;
 import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.ScatterData;
+import com.github.mikephil.charting.data.ScatterDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class TestActivity extends AppCompatActivity {
 
@@ -37,10 +45,19 @@ public class TestActivity extends AppCompatActivity {
     private Activity activityContext;
 
     // For plot
+    float xOffset;
+    float yOffset;
     private LineChart mChart;
     private LineChart mChartTeta;
     Thread thread;
     boolean plotData = false;
+
+    ScatterChart scatterChart;
+    ScatterData scatterData;
+    ScatterDataSet scatterDataSet;
+    ArrayList scatterEntries;
+    private ArrayList<ProcessedData> processedDataCache;
+    private ArrayList<ProcessedData> processedDataSortList;
 
 
     @Override
@@ -79,6 +96,22 @@ public class TestActivity extends AppCompatActivity {
         LineData data2 = new LineData();
         data2.setValueTextColor(Color.WHITE);
         mChartTeta.setData(data2);
+
+        scatterChart = findViewById(R.id.scatterChart);
+        scatterEntries = new ArrayList<>();
+        scatterEntries.add(new BarEntry(0f, 0));
+        scatterDataSet = new ScatterDataSet(scatterEntries, "");
+        scatterData = new ScatterData(scatterDataSet);
+        scatterChart.setData(scatterData);
+        scatterDataSet.setValueTextColor(Color.BLACK);
+        scatterDataSet.setValueTextSize(18f);
+
+        processedDataCache = new ArrayList<ProcessedData>();
+        processedDataSortList = new ArrayList<ProcessedData>();
+
+
+
+
 
 
         // start thread for frame control of plot
@@ -124,11 +157,20 @@ public class TestActivity extends AppCompatActivity {
 
                 if (processedData != null) {
                     xValue.setText("xValue: " + (float) processedData.getX());
+                    if(xOffset==0){
+                        xOffset = (float) processedData.getX();
+                    }
+                    if(yOffset==0){
+                        yOffset = (float) processedData.getY();
+                    }
+
+                    //Log.i("Test Activity       ", "X Position  "+ "    " + Float.toString((float)processedData.getX()-xOffset));
+
 
                     // add value to chart
                     if(plotData) {
 
-                        addChartEntry((float) processedData.getX());
+                        addChartEntry((float)processedData.getX()-xOffset);
 
                         // Caluclate angle from quaternion
                         Quaternion quaternion = new Quaternion(processedData.getQ0(),
@@ -137,6 +179,20 @@ public class TestActivity extends AppCompatActivity {
                         //addChartEntry(1);
                         plotData();
                         plotData2();
+
+
+                        processedDataCache.add(processedData);
+                        scatterEntries = new ArrayList<>();
+
+                        // sort processdata according to x
+                        Collections.sort(processedDataCache, ProcessedData.xSort);
+                        for(int i = 0; i<processedDataCache.size(); i++){
+                            scatterEntries.add(new BarEntry((int)(processedDataCache.get(i).getX()-xOffset)*10,   // unit dm
+                                    (int)((processedDataCache.get(i).getY()-yOffset))*10));
+                        }
+                        plotScatter();
+                        //Log.i("TEstActivity", "plotScatter called    ");
+
                     }
                     plotData = false;
                 }
@@ -227,6 +283,19 @@ public class TestActivity extends AppCompatActivity {
         }
     }
 
+
+    private void plotScatter(){
+
+        scatterDataSet = new ScatterDataSet(scatterEntries, "");
+        scatterData = new ScatterData(scatterDataSet);
+        scatterChart.setData(scatterData);
+
+        scatterData.notifyDataChanged();
+        scatterChart.notifyDataSetChanged();
+        scatterChart.invalidate();
+    }
+
+
     private void plotData(){
         LineData data = mChart.getData();
 
@@ -295,6 +364,7 @@ public class TestActivity extends AppCompatActivity {
         });
         thread.start();
     }
+
 }
 
 

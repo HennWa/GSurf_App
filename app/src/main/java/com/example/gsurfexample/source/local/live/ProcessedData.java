@@ -3,6 +3,8 @@ package com.example.gsurfexample.source.local.live;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.util.Comparator;
+
 @Entity(tableName = "processed_data_table")
 public class ProcessedData {
 
@@ -224,5 +226,18 @@ public class ProcessedData {
     public void setState(int state) {
         this.state = state;
     }
+
+    /*Comparator for sorting the list by roll no*/
+    public static Comparator<ProcessedData> xSort = new Comparator<ProcessedData>() {
+
+        public int compare(ProcessedData pd1, ProcessedData pd2) {
+
+            float pd1X = pd1.getX();
+            float pd2X = pd2.getX();
+
+            /*For ascending order*/
+            return (int) (pd1X - pd2X);
+        }
+    };
 
 }

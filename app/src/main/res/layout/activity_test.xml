@@ -31,14 +31,20 @@
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/chartX"
         android:layout_width="400dp"
-        android:layout_height="250sp"
+        android:layout_height="150sp"
         android:layout_marginTop="30dp"></com.github.mikephil.charting.charts.LineChart>
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/chartTeta"
         android:layout_width="400dp"
-        android:layout_height="250sp"
+        android:layout_height="150sp"
        android:layout_below="@id/chartX"></com.github.mikephil.charting.charts.LineChart>
+
+    <com.github.mikephil.charting.charts.ScatterChart
+        android:id="@+id/scatterChart"
+        android:layout_width="400dp"
+        android:layout_height="250sp"
+        android:layout_below="@id/chartTeta"></com.github.mikephil.charting.charts.ScatterChart>
 
     <LinearLayout
         android:layout_width="wrap_content"
