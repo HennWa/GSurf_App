@@ -57,7 +57,6 @@ public class TestActivity extends AppCompatActivity {
     ScatterDataSet scatterDataSet;
     ArrayList scatterEntries;
     private ArrayList<ProcessedData> processedDataCache;
-    private ArrayList<ProcessedData> processedDataSortList;
 
 
     @Override
@@ -105,10 +104,11 @@ public class TestActivity extends AppCompatActivity {
         scatterChart.setData(scatterData);
         scatterDataSet.setValueTextColor(Color.BLACK);
         scatterDataSet.setValueTextSize(18f);
+        scatterChart.setBackgroundColor(Color.WHITE);
+        scatterChart.setGridBackgroundColor(Color.WHITE);
+
 
         processedDataCache = new ArrayList<ProcessedData>();
-        processedDataSortList = new ArrayList<ProcessedData>();
-
 
 
 
@@ -287,6 +287,7 @@ public class TestActivity extends AppCompatActivity {
     private void plotScatter(){
 
         scatterDataSet = new ScatterDataSet(scatterEntries, "");
+        //scatterDataSet.setColor(Color.RED);
         scatterData = new ScatterData(scatterDataSet);
         scatterChart.setData(scatterData);
 

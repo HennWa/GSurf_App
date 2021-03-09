@@ -21,6 +21,7 @@ import java.util.ArrayList;
  */
 public class DataProcessor {
 
+    private final GlobalParams globalParams;
     private int intervalStepCount;
     private int sampleCount;
     private final ArrayList<ProcessedData> processedDataCache;
@@ -39,7 +40,7 @@ public class DataProcessor {
      */
     public DataProcessor() {
 
-        GlobalParams globalParams = GlobalParams.getInstance(); // get singleton
+        globalParams = GlobalParams.getInstance(); // get singleton
         sampleCount = 0;
         lastGPSLoc = new double[]{0, 0};
         Uk = new Matrix(2,1);
@@ -90,8 +91,8 @@ public class DataProcessor {
 
         // Step1: Madgwick algorithm to calculate quaternion
         madgwickAHRS.update( timeSample.getWx(),   timeSample.getWy(),  timeSample.getWz(),
-                            timeSample.getGFx(),  timeSample.getGFy(), timeSample.getGFz(),
-                             timeSample.getBx(),   timeSample.getBy(),  timeSample.getBz());
+                timeSample.getGFx(),  timeSample.getGFy(), timeSample.getGFz(),
+                timeSample.getBx(),   timeSample.getBy(),  timeSample.getBz());
 
         // Quaternion Object Java: (x,y,z,p) [same as in Scipy.Rotation], but result from madgwick(p,x,y,z)
         Quaternion quaternion = new Quaternion(Array.getFloat(madgwickAHRS.getQuaternion(), 1),
@@ -138,26 +139,33 @@ public class DataProcessor {
                 Zk.setData(SphericalMercator.lon2x(timeSample.getLon()),
                             SphericalMercator.lat2y(timeSample.getLat()));
 
-
-                //Log.i("DataProcessor",  " lon "+ SphericalMercator.lon2x(timeSample.getLon()));
-
-
                 // Storage for results from kalman filtering
                 double[][] updatedInterval = kalmanFilter.updateAndGetResults(Zk);  // size: states X number of samples
 
                 // Copy results to cache
-                for(int m = 0; m< updatedInterval[0].length; m++) {
-
-
-                    //Log.i("DataProcessor", "UpdatedInterval  "+ m + "    " + updatedInterval[0][m]);
-
-
-
+                for(int m = 0; m < updatedInterval[0].length; m++) {
                     processedDataCache.get(m).setX((float) updatedInterval[0][m]);
                     processedDataCache.get(m).setY((float) updatedInterval[1][m]);
                     processedDataCache.get(m).setdX((float) updatedInterval[2][m]);
                     processedDataCache.get(m).setdY((float) updatedInterval[3][m]);
                 }
+
+                // Step 5: State categorization
+
+                for(int m = 0; m < updatedInterval[0].length; m++) {
+                    if(Math.sqrt(processedDataCache.get(m).getDX() * processedDataCache.get(m).getDX() +
+                            processedDataCache.get(m).getDY() * processedDataCache.get(m).getDY()) >
+                            globalParams.waveThresholdVelocity){
+                        processedDataCache.get(m).setState(GlobalParams.States.valueOf("SURFINGWAVE").ordinal());
+                    }
+
+                    processedDataCache.get(m).setY((float) updatedInterval[1][m]);
+                    processedDataCache.get(m).setdX((float) updatedInterval[2][m]);
+                    processedDataCache.get(m).setdY((float) updatedInterval[3][m]);
+                }
+
+
+                // Set flag and return processed data in array
                 newInterval = true;
                 return processedDataCache;
             }

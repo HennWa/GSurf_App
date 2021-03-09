@@ -30,6 +30,14 @@ public class GlobalParams {
     public static Matrix x0 = new Matrix(4,1);
     public static Matrix P0 = new Matrix(4,4);
 
+    // state categorization
+    public static final float waveThresholdVelocity = 3.5f;  // [m/s]
+    public enum States{
+        NOTONWAVE,
+        SURFINGWAVE,
+        PADDELING
+    }
+
     // Singleton class
     public static GlobalParams getInstance() {
         if (instance == null)

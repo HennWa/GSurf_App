@@ -127,24 +127,6 @@ public class SensorDataFetch extends AsyncTask<Void, Void, Void> implements Sens
                 if(dataProcessorResultsOrNull != null){
                     for(int i=0; i<dataProcessorResultsOrNull.size(); i++){
                         processedDataRepository.insert(dataProcessorResultsOrNull.get(i));
-
-
-
-
-
-
-
-
-                        //Log.i("SensorDataFetch",  " from processed data "+ dataProcessorResultsOrNull.get(i).getX());
-
-
-
-
-
-
-
-
-
                     }
                 }
             }

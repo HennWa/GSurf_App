@@ -14,17 +14,14 @@ import java.util.List;
  */
 public class ProcessedDataRepository {
 
-    // Attributes
-    // General
-    private static final String TAG = "Repository";
-    private Application application;
+    private final Application application;
     // Interfaces and db access related
-    private ProcessedDataDao processedDataDao;
+    private final ProcessedDataDao processedDataDao;
     // Data fetching
     private SensorDataFetch sensorDataFetch;
     // Live Data
-    private LiveData<List<ProcessedData>> allProcessedData;
-    private LiveData<ProcessedData> lastProcessedDataSample;
+    private final LiveData<List<ProcessedData>> allProcessedData;
+    private final LiveData<ProcessedData> lastProcessedDataSample;
 
     /**
      * Constructor.
