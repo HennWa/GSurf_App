@@ -1,7 +1,5 @@
 package com.example.gsurfexample.utils.algorithms;
 
-import android.util.Log;
-
 import com.example.gsurfexample.source.local.live.ProcessedData;
 import com.example.gsurfexample.source.local.live.TimeSample;
 import com.example.gsurfexample.utils.other.GlobalParams;
@@ -130,7 +128,7 @@ public class DataProcessor {
             kalmanFilter.predict(Uk);
             if((timeSample.getLon() !=  lastGPSLoc[0]) ||
                     (timeSample.getLat() !=  lastGPSLoc[1]) ||
-                    intervalStepCount >= GlobalParams.maxIntervalLength-1){
+                    intervalStepCount >= globalParams.maxIntervalLength-1){
 
                 intervalStepCount = 0;
                 lastGPSLoc[0] = timeSample.getLon();

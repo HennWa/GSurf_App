@@ -7,11 +7,11 @@ public class GlobalParams {
     private static GlobalParams instance;
 
     // ResampleFilter
-    public static final long sampleR = 100;  // [ms]
-    public static final float sampleRs = sampleR/1e3f;  // [s]
+    public final long sampleR = 100;  // [ms]
+    public final float sampleRs = sampleR/1e3f;  // [s]
 
     // Madgwick algorithm
-    public static final float betaMadgwick = 0.1f; // [-]
+    public final float betaMadgwick = 0.1f; // [-]
 
     // Highpass filter
     //public static final float cutoff = 0.1f; // [Hz]
@@ -21,17 +21,17 @@ public class GlobalParams {
     double s2_x = 70*70;
     double s2_y = 70*70;
     double lambda2 = 10*10;
-    public static final int maxIntervalLength = 20;
-    public static Matrix A = new Matrix(4,4);
-    public static Matrix B = new Matrix(4,2);
-    public static Matrix Q = new Matrix(4,4);
-    public static Matrix H = new Matrix(2,4);
-    public static Matrix R = new Matrix(2,2);
-    public static Matrix x0 = new Matrix(4,1);
-    public static Matrix P0 = new Matrix(4,4);
+    public final int maxIntervalLength = 20;
+    public Matrix A = new Matrix(4,4);
+    public Matrix B = new Matrix(4,2);
+    public Matrix Q = new Matrix(4,4);
+    public Matrix H = new Matrix(2,4);
+    public Matrix R = new Matrix(2,2);
+    public Matrix x0 = new Matrix(4,1);
+    public Matrix P0 = new Matrix(4,4);
 
     // state categorization
-    public static final float waveThresholdVelocity = 3.5f;  // [m/s]
+    public final float waveThresholdVelocity = 3.5f;  // [m/s]
     public enum States{
         NOTONWAVE,
         SURFINGWAVE,
@@ -87,31 +87,31 @@ public class GlobalParams {
                    0,  0,  0,  0);
     }
 
-    public static Matrix getA() {
+    public Matrix getA() {
         return A;
     }
 
-    public static Matrix getB() {
+    public Matrix getB() {
         return B;
     }
 
-    public static Matrix getQ() {
+    public Matrix getQ() {
         return Q;
     }
 
-    public static Matrix getH() {
+    public Matrix getH() {
         return H;
     }
 
-    public static Matrix getR() {
+    public Matrix getR() {
         return R;
     }
 
-    public static Matrix getX0() {
+    public Matrix getX0() {
         return x0;
     }
 
-    public static Matrix getP0() {
+    public Matrix getP0() {
         return P0;
     }
 
