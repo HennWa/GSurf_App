@@ -1,6 +1,5 @@
 package com.example.gsurfexample.utils.algorithms;
 
-import com.example.gsurfexample.utils.other.GlobalParams;
 
 /**
  * KalmanFilter class. Taken from GitHub
@@ -64,10 +63,9 @@ public class KalmanFilter {
      *           of the state.
      */
     public KalmanFilter(Matrix A, Matrix B, Matrix H, Matrix Q,
-                        Matrix R, Matrix x0, Matrix P0, double dt) throws Exception{
+                        Matrix R, Matrix x0, Matrix P0, double dt, int maxIntervalLength) throws Exception{
 
         // maximal Storage size
-        int maxIntDataLength = GlobalParams.maxIntervalLength;
 
         int n = A.shape()[0];
         int v = H.shape()[0];
@@ -126,7 +124,7 @@ public class KalmanFilter {
         this.auxSDxMD = new Matrix(stateDimension, measureDimension);
         this.KYk = new Matrix(stateDimension, 1);
 
-        this.IntData = new Matrix(stateDimension, maxIntDataLength);
+        this.IntData = new Matrix(stateDimension, maxIntervalLength);
         this.LastStateOfLastInterval = new Matrix(stateDimension,1);
     }
 

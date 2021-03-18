@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/dark_blue_grey"
     tools:context=".ui.MainActivity">
 
     <TextView
@@ -11,7 +12,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/session_menu"
         android:text="Session Menu"
-        android:background="@color/bg_semi_dark"
+        android:background="@color/blue_grey"
         android:textColor="@color/white"
         android:gravity="center"
         android:paddingTop="2dp"

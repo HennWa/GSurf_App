@@ -22,8 +22,11 @@ import com.example.gsurfexample.source.local.live.ProcessedData;
 import com.example.gsurfexample.source.local.live.TimeSample;
 import com.example.gsurfexample.utils.algorithms.Quaternion;
 import com.example.gsurfexample.utils.factory.ProcessedDataViewModelFactory;
+import com.example.gsurfexample.utils.other.GlobalParams;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.ScatterChart;
+import com.github.mikephil.charting.components.LimitLine;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
@@ -32,6 +35,8 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.lang.reflect.Array;
@@ -49,13 +54,16 @@ public class TestActivity extends AppCompatActivity {
     float yOffset;
     private LineChart mChart;
     private LineChart mChartTeta;
+    private LineChart mChartVelo;
     Thread thread;
     boolean plotData = false;
 
     ScatterChart scatterChart;
     ScatterData scatterData;
     ScatterDataSet scatterDataSet;
+    ScatterDataSet scatterDataSet2;
     ArrayList scatterEntries;
+    ArrayList scatterEntries2;
     private ArrayList<ProcessedData> processedDataCache;
 
 
@@ -99,7 +107,10 @@ public class TestActivity extends AppCompatActivity {
         scatterChart = findViewById(R.id.scatterChart);
         scatterEntries = new ArrayList<>();
         scatterEntries.add(new BarEntry(0f, 0));
+        scatterEntries2 = new ArrayList<>();
+        scatterEntries2.add(new BarEntry(0f, 0));
         scatterDataSet = new ScatterDataSet(scatterEntries, "");
+        scatterDataSet2 = new ScatterDataSet(scatterEntries, "");
         scatterData = new ScatterData(scatterDataSet);
         scatterChart.setData(scatterData);
         scatterDataSet.setValueTextColor(Color.BLACK);
@@ -107,11 +118,26 @@ public class TestActivity extends AppCompatActivity {
         scatterChart.setBackgroundColor(Color.WHITE);
         scatterChart.setGridBackgroundColor(Color.WHITE);
 
+        mChartVelo = (LineChart) findViewById(R.id.chartVelocity);
+        mChartVelo.getDescription().setEnabled(true);
+        mChartVelo.getDescription().setText("Velocity");
+        mChartVelo.setTouchEnabled(false);
+        mChartVelo.setDragEnabled(false);
+        mChartVelo.setScaleEnabled(false);
+        mChartVelo.setPinchZoom(false);
+        mChartVelo.setBackgroundColor(Color.WHITE);
+        LineData dataVelo = new LineData();
+        dataVelo.setValueTextColor(Color.WHITE);
+        mChartVelo.setData(dataVelo);
+
+        LineData data4 = mChartVelo.getData();
+        ILineDataSet bondaryLines = createSetLimitLines();
+        data4.addDataSet(bondaryLines);
+        data4.addEntry(new Entry( -10, -10), 0);
+        data4.addEntry(new Entry( 10, 10), 0);
+
 
         processedDataCache = new ArrayList<ProcessedData>();
-
-
-
 
 
         // start thread for frame control of plot
@@ -164,34 +190,61 @@ public class TestActivity extends AppCompatActivity {
                         yOffset = (float) processedData.getY();
                     }
 
-                    //Log.i("Test Activity       ", "X Position  "+ "    " + Float.toString((float)processedData.getX()-xOffset));
-
-
                     // add value to chart
                     if(plotData) {
 
-                        addChartEntry((float)processedData.getX()-xOffset);
+                        // 1st figure
+                        //addChartEntry((float)processedData.getX()-xOffset);
+                        if(Math.abs(Math.sqrt(processedData.getDX() * processedData.getDX() +
+                                processedData.getDY() * processedData.getDY()))>200){
+                            addChartEntry(0f);
+                        }else{
+                            addChartEntry((float)Math.sqrt(processedData.getDX() * processedData.getDX() +
+                                    processedData.getDY() * processedData.getDY()));
+                        }
 
+
+                        // 2nd figure
                         // Caluclate angle from quaternion
+                        /*
                         Quaternion quaternion = new Quaternion(processedData.getQ0(),
                                 processedData.getQ1(), processedData.getQ2(), processedData.getQ3());
-                        addChartEntry2((float)(quaternion.toEulerAngles()[1]/Math.PI*180));
-                        //addChartEntry(1);
+                        addChartEntry2((float)(quaternion.toEulerAngles()[1]/Math.PI*180)); */
+                        if(Math.abs(Math.sqrt(processedData.getDXFilt() * processedData.getDXFilt() +
+                                processedData.getDYFilt() * processedData.getDYFilt()))>200){
+                            addChartEntry2(0f);
+                        }else{
+                            addChartEntry2((float)Math.sqrt(processedData.getDXFilt() * processedData.getDXFilt() +
+                                    processedData.getDYFilt() * processedData.getDYFilt()));
+                        }
+
                         plotData();
                         plotData2();
 
-
+                        // 3rd figure Location plot
+                        // here just a cache for now to sort data for plot
                         processedDataCache.add(processedData);
                         scatterEntries = new ArrayList<>();
-
+                        scatterEntries2 = new ArrayList<>();
                         // sort processdata according to x
+                        /*
                         Collections.sort(processedDataCache, ProcessedData.xSort);
                         for(int i = 0; i<processedDataCache.size(); i++){
-                            scatterEntries.add(new BarEntry((int)(processedDataCache.get(i).getX()-xOffset)*10,   // unit dm
-                                    (int)((processedDataCache.get(i).getY()-yOffset))*10));
+                            if(processedDataCache.get(i).getState() == GlobalParams.States.valueOf("FLOATING").ordinal()){
+                                scatterEntries.add(new BarEntry((int)(processedDataCache.get(i).getX()-xOffset)*10,   // unit dm
+                                        (int)((processedDataCache.get(i).getY()-yOffset))*10));
+                            }else{
+
+                                scatterEntries2.add(new BarEntry((int)(processedDataCache.get(i).getX()-xOffset)*10,   // unit dm
+                                        (int)((processedDataCache.get(i).getY()-yOffset))*10));
+                            }
                         }
-                        plotScatter();
-                        //Log.i("TEstActivity", "plotScatter called    ");
+                        plotScatter(); */
+
+                        // 4th figure
+                        // Velocity plot
+                        addChartVelo((float)processedData.getDXFilt(), (float)processedData.getDYFilt());
+                        plotDataVelo();
 
                     }
                     plotData = false;
@@ -204,7 +257,8 @@ public class TestActivity extends AppCompatActivity {
         buttonAddNote2.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                getBack();
+                processedDataViewModel.stopSensorDataFetch();
+                //getBack();
             }
         });
 
@@ -283,12 +337,35 @@ public class TestActivity extends AppCompatActivity {
         }
     }
 
+    private void addChartVelo(float dX, float dY){
+        LineData data4 = mChartVelo.getData();
+
+        data4.removeDataSet(1);
+        ILineDataSet set4 = createSet();
+        data4.addDataSet(set4);
+
+        if (dX<0){
+            data4.addEntry(new Entry( dX, dY), 1);
+            data4.addEntry(new Entry( 0, 0), 1);
+        }else{
+            data4.addEntry(new Entry( 0, 0), 1);
+            data4.addEntry(new Entry( dX, dY), 1);
+        }
+    }
 
     private void plotScatter(){
 
         scatterDataSet = new ScatterDataSet(scatterEntries, "");
-        //scatterDataSet.setColor(Color.RED);
-        scatterData = new ScatterData(scatterDataSet);
+        scatterDataSet2 = new ScatterDataSet(scatterEntries2, "Fast");
+
+        scatterDataSet2.setScatterShapeHoleColor(Color.MAGENTA);
+        scatterDataSet2.setColor(Color.MAGENTA);
+        scatterDataSet2.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
+
+        ArrayList<IScatterDataSet> dataSets = new ArrayList<>();
+        dataSets.add(scatterDataSet); // add the data sets
+        dataSets.add(scatterDataSet2);
+        scatterData = new ScatterData(dataSets);
         scatterChart.setData(scatterData);
 
         scatterData.notifyDataChanged();
@@ -335,12 +412,43 @@ public class TestActivity extends AppCompatActivity {
         }
     }
 
+
+    private void plotDataVelo(){
+        LineData dataVelo = mChartVelo.getData();
+
+        if(dataVelo !=null){
+            dataVelo.notifyDataChanged();
+            mChartVelo.notifyDataSetChanged();   // both for data update necessary
+
+            // enables drag to left/right
+            mChartVelo.setDragEnabled(true);
+            // moves chart to the latest entry
+            //mChartVelo.moveViewToX(-10);
+
+
+            // do not forget to invalidate()
+            mChartVelo.invalidate();
+            plotData = false;
+        }
+    }
+
+
     // Set for plot
     private LineDataSet createSet(){
         LineDataSet set = new LineDataSet(null, "Dynamic Data");
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
         set.setLineWidth(3f);
         set.setColor(Color.MAGENTA);
+        set.setMode(LineDataSet.Mode.LINEAR);
+        set.setDrawCircles(false);
+        return set;
+    }
+
+    private LineDataSet createSetLimitLines(){
+        LineDataSet set = new LineDataSet(null, "Boundaries");
+        set.setAxisDependency(YAxis.AxisDependency.LEFT);
+        set.setLineWidth(1f);
+        set.setColor(Color.WHITE);
         set.setMode(LineDataSet.Mode.LINEAR);
         set.setDrawCircles(false);
         return set;

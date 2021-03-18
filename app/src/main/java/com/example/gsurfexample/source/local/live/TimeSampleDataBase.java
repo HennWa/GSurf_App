@@ -47,12 +47,12 @@ public abstract class TimeSampleDataBase extends RoomDatabase {
         @Override
         protected Void doInBackground(Void... voids) {
             processedDataDao.insert(new ProcessedData(0, 0, 0f, 0f,
-                    0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f,
-                    0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0));
+                    0f, 0f, 0f, 0f, 0f, 0f, 0f,0f, 0f,
+                    0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f,
+                    0));
             return null;
         }
     }
-
 
     // Methods
     public static synchronized TimeSampleDataBase getInstance(Context context){

@@ -13,21 +13,22 @@ public class ProcessedData {
     private int session_id;
     private long timeStamp;
     private float ddX, ddY, ddZ;
-    private float dX, dY, dZ;
-    private float X, Y, Z;
+    private double dX, dY, dZ;
+    private double X, Y, Z;
+    private double dXFilt, dYFilt;
     private float wx, wy, wz;
     private float q0, q1, q2, q3; // quaternions
-    private float lat, lon;
+    private double lat, lon;
     private int state;
-
 
     public ProcessedData(int session_id, long timeStamp,
                          float ddX, float ddY, float ddZ,
-                         float dX, float dY, float dZ,
-                         float X, float Y, float Z,
+                         double dX, double dY, double dZ,
+                         double X, double Y, double Z,
+                         double dXFilt, double dYFilt,
                          float wx, float wy, float wz,
                          float q0, float q1, float q2, float q3,
-                         float lat, float lon, int state) {
+                         double lat, double lon, int state) {
 
 
         this.session_id = session_id;
@@ -41,6 +42,8 @@ public class ProcessedData {
         this.X = X;
         this.Y = Y;
         this.Z = Z;
+        this.dXFilt = dXFilt;
+        this.dYFilt = dYFilt;
         this.wx = wx;
         this.wy = wy;
         this.wz = wz;
@@ -81,29 +84,34 @@ public class ProcessedData {
         return ddZ;
     }
 
-    public float getDX() {
+    public double getDX() {
         return dX;
     }
 
-    public float getDY() {
+    public double getDY() {
         return dY;
     }
 
-    public float getDZ() {
+    public double getDZ() {
         return dZ;
     }
 
-    public float getX() {
+    public double getX() {
         return X;
     }
 
-    public float getY() {
+    public double getY() {
         return Y;
     }
 
-    public float getZ() {
+
+    public double getZ() {
         return Z;
     }
+
+    public double getDXFilt() { return dXFilt; }
+
+    public double getDYFilt() { return dYFilt; }
 
     public float getWx() {
         return wx;
@@ -133,11 +141,11 @@ public class ProcessedData {
         return q3;
     }
 
-    public float getLat() {
+    public double getLat() {
         return lat;
     }
 
-    public float getLon() {
+    public double getLon() {
         return lon;
     }
 
@@ -163,27 +171,29 @@ public class ProcessedData {
         this.ddZ = ddZ;
     }
 
-    public void setdX(float dX) {
-        this.dX = dX;
-    }
+    public void setdX(double dX) { this.dX = dX; }
 
-    public void setdY(float dY) {
+    public void setdY(double dY) {
         this.dY = dY;
     }
 
-    public void setdZ(float dZ) {
+    public void setdZ(double dZ) {
         this.dZ = dZ;
     }
 
-    public void setX(float x) {
+    public void setDXFilt(double dXFilt) { this.dXFilt = dXFilt; }
+
+    public void setDYFilt(double dYFilt) { this.dYFilt = dYFilt; }
+
+    public void setX(double x) {
         X = x;
     }
 
-    public void setY(float y) {
+    public void setY(double y) {
         Y = y;
     }
 
-    public void setZ(float z) {
+    public void setZ(double z) {
         Z = z;
     }
 
@@ -232,8 +242,8 @@ public class ProcessedData {
 
         public int compare(ProcessedData pd1, ProcessedData pd2) {
 
-            float pd1X = pd1.getX();
-            float pd2X = pd2.getX();
+            double pd1X = pd1.getX();
+            double pd2X = pd2.getX();
 
             /*For ascending order*/
             return (int) (pd1X - pd2X);

@@ -17,6 +17,7 @@ public class KalmanFilterTest {
     public void testKalmanFilter() {
 
         // Preparations
+        int maxIntervals = 20;
         double dt = 0.1;
         double s2_x = 70*70;
         double s2_y = 70*70;
@@ -135,7 +136,7 @@ public class KalmanFilterTest {
         // Instantiate
         KalmanFilter kalmanFilter;
         try{
-            kalmanFilter = new KalmanFilter(A, B, H, Q, R, x0, P0, dt);
+            kalmanFilter = new KalmanFilter(A, B, H, Q, R, x0, P0, dt, maxIntervals);
 
             // Storage allocation for results
             double[][] estPred = new double[n][4];
@@ -192,7 +193,7 @@ public class KalmanFilterTest {
                 { 0.,          0.,          0.,          0.        }};
 
         try{
-            KalmanFilter kalmanFilter2 = new KalmanFilter(A, B, H, Q, R, x0, P0, 0.1);
+            KalmanFilter kalmanFilter2 = new KalmanFilter(A, B, H, Q, R, x0, P0, 0.1, maxIntervals);
 
             double[][] estProc = new double[n][4];
             double[][] updatedInterval;

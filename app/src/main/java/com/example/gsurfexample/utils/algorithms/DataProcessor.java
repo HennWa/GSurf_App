@@ -1,5 +1,6 @@
 package com.example.gsurfexample.utils.algorithms;
 
+
 import com.example.gsurfexample.source.local.live.ProcessedData;
 import com.example.gsurfexample.source.local.live.TimeSample;
 import com.example.gsurfexample.utils.other.GlobalParams;
@@ -24,12 +25,16 @@ public class DataProcessor {
     private int sampleCount;
     private final ArrayList<ProcessedData> processedDataCache;
 
-    private MadgwickAHRS madgwickAHRS;              // Sensor fusion algorithm
-    private KalmanFilter kalmanFilter;              // KalmanFilter for sensor fusion
+    private MadgwickAHRS madgwickAHRS;                          // Sensor fusion algorithm
+    private KalmanFilter kalmanFilter;                          // KalmanFilter for sensor fusion
+    private DigitalButterworthFilter lowPassFilterDX;           // Filter for velocity in X direction
+    private DigitalButterworthFilter lowPassFilterDY;           // Filter for velocity in Y direction
+    //private ShiftingAverageFilter lowPassFilterDX;              // Filter for velocity in X direction
+    //private ShiftingAverageFilter lowPassFilterDY;              // Filter for velocity in Y direction
 
-    private final Matrix Uk;                              // Input matrix for sensor fusion
-    private final Matrix Zk;                              // Measurement (GPS) matrix for sensor fusion
-    private final double[] lastGPSLoc;                      // last timeSample for GPS values comparison
+    private final Matrix Uk;                                    // Input matrix for sensor fusion
+    private final Matrix Zk;                                    // Measurement (GPS) matrix for sensor fusion
+    private final double[] lastGPSLoc;                          // last timeSample for GPS values comparison
     private boolean newInterval;
 
 
@@ -50,7 +55,13 @@ public class DataProcessor {
             madgwickAHRS = new MadgwickAHRS(globalParams.sampleRs, globalParams.betaMadgwick);
             kalmanFilter = new KalmanFilter(globalParams.getA(), globalParams.getB(), globalParams.getH(),
                     globalParams.getQ(), globalParams.getR(), globalParams.getX0(), globalParams.getP0(),
-                    globalParams.sampleRs);
+                    globalParams.sampleRs, globalParams.maxIntervalLength);
+            lowPassFilterDX = new DigitalButterworthFilter(globalParams.nominatorLPVelocity,
+                    globalParams.denominatorLPVelocity);
+            lowPassFilterDY = new DigitalButterworthFilter(globalParams.nominatorLPVelocity,
+                    globalParams.denominatorLPVelocity);
+            //lowPassFilterDX = new ShiftingAverageFilter(20); // only temporary
+            //lowPassFilterDY = new ShiftingAverageFilter(20);
         }catch(Exception e) {
             e.printStackTrace();
         }
@@ -105,10 +116,10 @@ public class DataProcessor {
         // Copy results of this sample as available here
         processedDataCache.add(new ProcessedData(1, timeSample.getTimeStamp(),
                 globalAccelerations[0], globalAccelerations[1], globalAccelerations[2],
-                0f, 0f, 0f, 0f, 0f, 0f,   // from later processing steps
+                0f, 0f, 0f, 0f, 0f, 0f, 0f , 0f,  // from later processing steps
                 timeSample.getWx(), timeSample.getWy(), timeSample.getWz(),
                 quaternion.getX(), quaternion.getY(), quaternion.getZ(), quaternion.getW(), // w value of quaternion according to python scipy convention (different from Madgwick)
-                (float)timeSample.getLat(), (float)timeSample.getLon(), 1));
+                (float)timeSample.getLat(), (float)timeSample.getLon(), 0));
 
 
         // Step 3: High-pass-filter for Z direction
@@ -142,26 +153,40 @@ public class DataProcessor {
 
                 // Copy results to cache
                 for(int m = 0; m < updatedInterval[0].length; m++) {
-                    processedDataCache.get(m).setX((float) updatedInterval[0][m]);
-                    processedDataCache.get(m).setY((float) updatedInterval[1][m]);
-                    processedDataCache.get(m).setdX((float) updatedInterval[2][m]);
-                    processedDataCache.get(m).setdY((float) updatedInterval[3][m]);
+                    processedDataCache.get(m).setX(updatedInterval[0][m]);
+                    processedDataCache.get(m).setY(updatedInterval[1][m]);
+                    processedDataCache.get(m).setdX(updatedInterval[2][m]);
+                    processedDataCache.get(m).setdY(updatedInterval[3][m]);
                 }
 
-                // Step 5: State categorization
-
+                // Step 5: Low pass filtering of velocities (Note: Precision loos due to float)
+                float[] dX = new float[updatedInterval[0].length];
+                float[] dY = new float[updatedInterval[0].length];
                 for(int m = 0; m < updatedInterval[0].length; m++) {
-                    if(Math.sqrt(processedDataCache.get(m).getDX() * processedDataCache.get(m).getDX() +
-                            processedDataCache.get(m).getDY() * processedDataCache.get(m).getDY()) >
+                    dX[m] = (float)processedDataCache.get(m).getDX();
+                    dY[m] = (float)processedDataCache.get(m).getDY();
+                }
+                float[] dXFilt = lowPassFilterDX.filterSequence(dX);
+                //noinspection SuspiciousNameCombination
+                float[] dYFilt = lowPassFilterDY.filterSequence(dY);
+
+                // Copy results to cache
+                for(int m = 0; m < updatedInterval[0].length; m++) {
+                    processedDataCache.get(m).setDXFilt(dXFilt[m]);
+                    processedDataCache.get(m).setDYFilt(dYFilt[m]);
+                }
+
+                // Step 6: State categorization
+
+                // Wave detection
+                for(int m = 0; m < updatedInterval[0].length; m++) {
+                    // Categorization by velocity
+                    if(Math.sqrt(processedDataCache.get(m).getDXFilt() * processedDataCache.get(m).getDXFilt() +
+                            processedDataCache.get(m).getDYFilt() * processedDataCache.get(m).getDYFilt()) >
                             globalParams.waveThresholdVelocity){
                         processedDataCache.get(m).setState(GlobalParams.States.valueOf("SURFINGWAVE").ordinal());
                     }
-
-                    processedDataCache.get(m).setY((float) updatedInterval[1][m]);
-                    processedDataCache.get(m).setdX((float) updatedInterval[2][m]);
-                    processedDataCache.get(m).setdY((float) updatedInterval[3][m]);
                 }
-
 
                 // Set flag and return processed data in array
                 newInterval = true;
@@ -170,8 +195,7 @@ public class DataProcessor {
         }catch(Exception e) {
             e.printStackTrace();
         }
-
-        //Log.i("DataProcessor", "Counter "+ intervalStepCount);
+        
         // Increment counter of interval steps and processed time samples
         intervalStepCount += 1;
         sampleCount += 1;

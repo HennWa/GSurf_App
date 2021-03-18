@@ -39,6 +39,7 @@ public class SensorDataFetch extends AsyncTask<Void, Void, Void> implements Sens
 
     // Attributes
     // General
+    private final GlobalParams globalParams;
     private static final String TAG = "SensorDataFetch";
     private Application application;
     private ProcessedDataRepository processedDataRepository;
@@ -69,6 +70,7 @@ public class SensorDataFetch extends AsyncTask<Void, Void, Void> implements Sens
     public SensorDataFetch(Application app, ProcessedDataRepository repository) {
         // Initialization
         application = app;
+        globalParams = GlobalParams.getInstance(); // get singleton
         processedDataRepository = repository;
         timeSampleCache = new ArrayList<TimeSample>();
         dataProcessor = new DataProcessor(); // from global config
@@ -140,7 +142,7 @@ public class SensorDataFetch extends AsyncTask<Void, Void, Void> implements Sens
      */
     @Override
     protected Void doInBackground(Void... params) {
-        resampleFilter = new ResampleFilter(GlobalParams.sampleR);  // in global config file
+        resampleFilter = new ResampleFilter(globalParams.sampleR);  // in global config file
 
         Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         if (accelerometer != null) {

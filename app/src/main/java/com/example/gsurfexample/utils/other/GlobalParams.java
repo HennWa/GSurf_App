@@ -16,6 +16,18 @@ public class GlobalParams {
     // Highpass filter
     //public static final float cutoff = 0.1f; // [Hz]
 
+    // Low pass filter speed
+    // cut-off frequency 0.3 Hz
+    //public float nominatorLPVelocity[] = {0.39133577f, 0.78267155f, 0.39133577f};
+    //public float denominatorLPVelocity[] = {1.f,   0.36952738f, 0.19581571f};
+    // cut-off frequency 0.2 Hz
+    //public float nominatorLPVelocity[] = {0.00362168f, 0.00724336f, 0.00362168f};
+    //public float denominatorLPVelocity[] = {1.f,     -1.82269493f,  0.83718165f};
+    // cut-off frequency 0.1 Hz
+    public float nominatorLPVelocity[] = {0.00094469f, 0.00188938f, 0.00094469f};
+    public float denominatorLPVelocity[] = {1.f,      -1.91119707f, 0.91497583f};
+
+
     // KalmanFilter
     double dt = (double)sampleR/1000;
     double s2_x = 70*70;
@@ -33,7 +45,7 @@ public class GlobalParams {
     // state categorization
     public final float waveThresholdVelocity = 3.5f;  // [m/s]
     public enum States{
-        NOTONWAVE,
+        FLOATING,
         SURFINGWAVE,
         PADDELING
     }
