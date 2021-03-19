@@ -6,7 +6,7 @@ import android.app.Application;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.gsurfexample.ui.NoteViewModel;
+import com.example.gsurfexample.ui.SurfSessionViewModel;
 
 public class TestViewModelFactory  implements ViewModelProvider.Factory{
     static Application application;
@@ -17,6 +17,6 @@ public class TestViewModelFactory  implements ViewModelProvider.Factory{
 
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass) {
-        return (T) new NoteViewModel(application);
+        return (T) new SurfSessionViewModel(application);
     }
 }

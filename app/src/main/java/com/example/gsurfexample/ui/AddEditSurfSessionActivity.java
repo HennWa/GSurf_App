@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.example.gsurfexample.R;
 
-public class AddEditNoteActivity extends AppCompatActivity {
+public class AddEditSurfSessionActivity extends AppCompatActivity {
     public static final String EXTRA_ID =
             "com.example.architectureexample.EXTRA_ID";
     public static final String EXTRA_TITLE =
@@ -30,7 +30,7 @@ public class AddEditNoteActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_note);
+        setContentView(R.layout.activity_add_surfsession);
 
         editTextTitle = findViewById(R.id.edit_text_title);
         editTextDescription = findViewById(R.id.edit_text_description);
@@ -44,16 +44,16 @@ public class AddEditNoteActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         if(intent.hasExtra(EXTRA_ID)){
-            setTitle("Edit Note");
+            setTitle("Edit Surf Session");
             editTextTitle.setText(intent.getStringExtra(EXTRA_TITLE));
             editTextDescription.setText(intent.getStringExtra(EXTRA_DESCRIPTION));
             numberPickerPriority.setValue(intent.getIntExtra(EXTRA_PRIORITY, 1));
         } else{
-            setTitle("Add Note");
+            setTitle("Add Surf Session");
         }
     }
 
-    private void saveNote(){
+    private void saveSurfSession(){
         String title = editTextTitle.getText().toString();
         String description = editTextDescription.getText().toString();
         int priority = numberPickerPriority.getValue();
@@ -81,15 +81,15 @@ public class AddEditNoteActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.add_note_menu,menu);
+        menuInflater.inflate(R.menu.add_surfsession_menu,menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
-            case R.id.save_note:
-                saveNote();
+            case R.id.save_surfsession:
+                saveSurfSession();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -5,8 +5,8 @@ import android.graphics.Bitmap;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "note_table")
-public class Note {
+@Entity(tableName = "session_table")
+public class SurfSession {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -17,7 +17,7 @@ public class Note {
     //private Bitmap image;
 
 
-    public Note(String title, String description, int priority) {
+    public SurfSession(String title, String description, int priority) {
         this.title = title;
         this.description = description;
         this.priority = priority;

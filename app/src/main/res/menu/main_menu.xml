@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/delte_all_notes"
-        android:title="Delete all notes"
+        android:id="@+id/delte_all_surfsessions"
+        android:title="Delete all surf sessions"
         app:showAsAction = "never" />
 </menu>

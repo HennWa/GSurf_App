@@ -9,17 +9,17 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {Note.class}, version =1)
-public abstract class NoteDataBase extends RoomDatabase {
+@Database(entities = {SurfSession.class}, version =1)
+public abstract class SurfSessionDataBase extends RoomDatabase {
 
-    private static NoteDataBase instance;
+    private static SurfSessionDataBase instance;
 
-    public abstract NoteDao noteDao();
+    public abstract SurfSessionDao surfSessionDao();
 
-    public static synchronized NoteDataBase getInstance(Context context){
+    public static synchronized SurfSessionDataBase getInstance(Context context){
         if(instance == null){
             instance = Room.databaseBuilder(context.getApplicationContext(),
-                    NoteDataBase.class, "note_database")
+                    SurfSessionDataBase.class, "session_database")
                     .fallbackToDestructiveMigration()
                     .addCallback(roomCallback)
                     .build();
@@ -37,17 +37,17 @@ public abstract class NoteDataBase extends RoomDatabase {
 
     private static class PopulateDbAsyncTask extends AsyncTask<Void, Void, Void>{
 
-        private NoteDao noteDao;
+        private SurfSessionDao surfSessionDao;
 
-        private PopulateDbAsyncTask(NoteDataBase db){
-            noteDao = db.noteDao();
+        private PopulateDbAsyncTask(SurfSessionDataBase db){
+            surfSessionDao = db.surfSessionDao();
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            noteDao.insert(new Note("Titel 1", "Description 1", 1));
-            noteDao.insert(new Note("Titel 2", "Description 2", 2));
-            noteDao.insert(new Note("Titel 3", "Description 3", 3));
+            surfSessionDao.insert(new SurfSession("Titel 1", "Description 1", 1));
+            surfSessionDao.insert(new SurfSession("Titel 2", "Description 2", 2));
+            surfSessionDao.insert(new SurfSession("Titel 3", "Description 3", 3));
             return null;
         }
     }
