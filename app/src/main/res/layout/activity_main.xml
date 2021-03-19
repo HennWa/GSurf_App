@@ -23,10 +23,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/session_menu"
-        tools:listitem="@layout/surfSession_item"/>
+        tools:listitem="@layout/surfsession_item"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_add_note"
+        android:id="@+id/button_add_session"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_add"
@@ -37,7 +37,7 @@
         android:id="@+id/button_test"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|end"
+        android:layout_below="@id/button_add_session"
         android:layout_margin="32dp"/>
 
 </RelativeLayout>

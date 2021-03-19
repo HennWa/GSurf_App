@@ -22,7 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.example.gsurfexample.ui.AddEditNoteActivity"
+        <activity android:name="com.example.gsurfexample.ui.AddEditSurfSessionActivity"
             android:parentActivityName="com.example.gsurfexample.ui.MainActivity"/>
         <activity android:name="com.example.gsurfexample.ui.TestActivity"
             android:parentActivityName="com.example.gsurfexample.ui.MainActivity"/>
