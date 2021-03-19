@@ -45,6 +45,8 @@ import java.util.Collections;
 
 public class TestActivity extends AppCompatActivity {
 
+    public static final int ADD_SURFSESSION_REQUEST = 1;
+
     private ProcessedDataViewModel processedDataViewModel;
     private TextView xValue;
     private Activity activityContext;
@@ -284,11 +286,12 @@ public class TestActivity extends AppCompatActivity {
         });
 
         // Button for stopping data fetch
-        FloatingActionButton buttonStop = findViewById(R.id.button_stop);
-        buttonStop.setOnClickListener(new View.OnClickListener(){
+        FloatingActionButton buttonSave = findViewById(R.id.button_save);
+        buttonSave.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(TestActivity.this, AddEditSurfSessionActivity.class);
+                startActivityForResult(intent, ADD_SURFSESSION_REQUEST);
             }
         });
     }

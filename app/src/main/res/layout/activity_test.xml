@@ -84,7 +84,7 @@
             android:backgroundTint="@color/dark_orange"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_stop"
+            android:id="@+id/button_save"
             android:layout_marginLeft="40dp"
             android:layout_width="50dp"
             android:layout_height="50dp"
