@@ -9,6 +9,8 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import java.util.UUID;
+
 @Database(entities = {TimeSample.class, ProcessedData.class}, version =1)
 public abstract class TimeSampleDataBase extends RoomDatabase {
 
@@ -46,7 +48,8 @@ public abstract class TimeSampleDataBase extends RoomDatabase {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            processedDataDao.insert(new ProcessedData(0, 0, 0f, 0f,
+            processedDataDao.insert(new ProcessedData( UUID.randomUUID().toString(),
+                    0, 0f, 0f,
                     0f, 0f, 0f, 0f, 0f, 0f, 0f,0f, 0f,
                     0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f,
                     0));

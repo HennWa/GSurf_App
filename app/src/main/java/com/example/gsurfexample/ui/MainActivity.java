@@ -36,8 +36,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FloatingActionButton buttonAddNote = findViewById(R.id.button_add_session);
-        buttonAddNote.setOnClickListener(new View.OnClickListener(){
+        FloatingActionButton buttonAddSession = findViewById(R.id.button_add_session);
+        buttonAddSession.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AddEditSurfSessionActivity.class);
@@ -62,11 +62,11 @@ public class MainActivity extends AppCompatActivity {
         SurfSessionAdapter adapter = new SurfSessionAdapter(this);
         recyclerView.setAdapter(adapter);
 
-        // Instantiate and connect noteViewModel to Live Data
+        // Instantiate and connect surfSessionViewModel to Live Data
         TestViewModelFactory viewModelFactory;
         viewModelFactory = new TestViewModelFactory(this.getApplication());
         surfSessionViewModel = new ViewModelProvider(this, viewModelFactory).get(SurfSessionViewModel.class);
-        surfSessionViewModel.getAllNotes().observe(this, new Observer<List<SurfSession>>() {
+        surfSessionViewModel.getAllSurfSessions().observe(this, new Observer<List<SurfSession>>() {
             @Override
             public void onChanged(@Nullable List<SurfSession> surfSessions) {
                 adapter.submitList(surfSessions);
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 surfSessionViewModel.delete(adapter.getSurfSessionAt(viewHolder.getAdapterPosition()));
-                Toast.makeText(MainActivity.this, "Note deleted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Session deleted", Toast.LENGTH_SHORT).show();
             }
         }).attachToRecyclerView(recyclerView);
 
@@ -111,26 +111,27 @@ public class MainActivity extends AppCompatActivity {
             String description = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_DESCRIPTION);
             int priority = data.getIntExtra(AddEditSurfSessionActivity.EXTRA_PRIORITY, 1);
 
-            SurfSession surfSession = new SurfSession(title, description, priority);
+            SurfSession surfSession = new SurfSession("0", title, description, priority);
             surfSessionViewModel.insert(surfSession);
 
-            Toast.makeText(this,"Note saved",Toast.LENGTH_SHORT).show();
-        } else if(requestCode == EDIT_SURFSESSION_REQUEST && resultCode == RESULT_OK){
+            Toast.makeText(this,"Session saved",Toast.LENGTH_SHORT).show();
+
+        }else if(requestCode == EDIT_SURFSESSION_REQUEST && resultCode == RESULT_OK){
             int id = data.getIntExtra(AddEditSurfSessionActivity.EXTRA_ID, -1);
 
             if(id == -1){
-                Toast.makeText(this,"Note could not be updated",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"Session could not be updated",Toast.LENGTH_SHORT).show();
                 return;
             }
             String title = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_TITLE);
             String description = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_DESCRIPTION);
             int priority = data.getIntExtra(AddEditSurfSessionActivity.EXTRA_PRIORITY, 1);
 
-            SurfSession surfSession = new SurfSession(title, description, priority);
+            SurfSession surfSession = new SurfSession("0", title, description, priority);
             surfSession.setId(id);
             surfSessionViewModel.update(surfSession);
 
-            Toast.makeText(this,"Note updated",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Session updated",Toast.LENGTH_SHORT).show();
 
         } else{
             Toast.makeText(this,"Nothing happens",Toast.LENGTH_SHORT).show();

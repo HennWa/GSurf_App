@@ -10,18 +10,23 @@ public class SurfSession {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
-
+    private String sessionID;
     private String title;
     private String description;
     private int priority;
     //private Bitmap image;
 
 
-    public SurfSession(String title, String description, int priority) {
+    public SurfSession(String sessionID, String title, String description, int priority) {
+        this.sessionID = sessionID;
         this.title = title;
         this.description = description;
         this.priority = priority;
     }
+
+    public void setSessionID(String sessionID) { this.sessionID = sessionID; }
+
+    public String getSessionID() { return sessionID; }
 
     public void setId(int id) {
         this.id = id;

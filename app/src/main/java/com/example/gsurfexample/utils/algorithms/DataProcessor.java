@@ -7,6 +7,7 @@ import com.example.gsurfexample.utils.other.GlobalParams;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Data Processor provides function processTimeSample which takes a TimeSample and
@@ -20,6 +21,7 @@ import java.util.ArrayList;
  */
 public class DataProcessor {
 
+    private String sessionID;
     private final GlobalParams globalParams;
     private int intervalStepCount;
     private int sampleCount;
@@ -43,6 +45,7 @@ public class DataProcessor {
      */
     public DataProcessor() {
 
+        sessionID = UUID.randomUUID().toString();
         globalParams = GlobalParams.getInstance(); // get singleton
         sampleCount = 0;
         lastGPSLoc = new double[]{0, 0};
@@ -114,7 +117,7 @@ public class DataProcessor {
                                                     timeSample.getDdy(), timeSample.getDdz()});
 
         // Copy results of this sample as available here
-        processedDataCache.add(new ProcessedData(1, timeSample.getTimeStamp(),
+        processedDataCache.add(new ProcessedData(sessionID, timeSample.getTimeStamp(),
                 globalAccelerations[0], globalAccelerations[1], globalAccelerations[2],
                 0f, 0f, 0f, 0f, 0f, 0f, 0f , 0f,  // from later processing steps
                 timeSample.getWx(), timeSample.getWy(), timeSample.getWz(),

@@ -211,9 +211,9 @@ public class ProcessedDataRepository {
      * Get entry by id in database.
      * @return Specific entry in database not as LiveData.
      */
-    public ProcessedData getProcessedDataSamplesById(int id) {
-        return processedDataDao.getProcessedDataSamplesById(id);
-    }
+    //public ProcessedData getProcessedDataSamplesById(int id) {
+    //    return processedDataDao.getProcessedDataSamplesById(id);
+    //}
 }
 
 

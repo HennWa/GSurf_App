@@ -10,7 +10,7 @@ public class ProcessedData {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
-    private int session_id;
+    private String session_id;
     private long timeStamp;
     private float ddX, ddY, ddZ;
     private double dX, dY, dZ;
@@ -21,7 +21,7 @@ public class ProcessedData {
     private double lat, lon;
     private int state;
 
-    public ProcessedData(int session_id, long timeStamp,
+    public ProcessedData(String session_id, long timeStamp,
                          float ddX, float ddY, float ddZ,
                          double dX, double dY, double dZ,
                          double X, double Y, double Z,
@@ -56,15 +56,10 @@ public class ProcessedData {
         this.state = state;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
 
-    public int getId() {
-        return id;
-    }
+    public int getId() { return id; }
 
-    public int getSession_id() {
+    public String getSession_id() {
         return session_id;
     }
 
@@ -103,7 +98,6 @@ public class ProcessedData {
     public double getY() {
         return Y;
     }
-
 
     public double getZ() {
         return Z;
@@ -151,7 +145,9 @@ public class ProcessedData {
 
     public int getState() { return state; }
 
-    public void setSession_id(int session_id) {
+    public void setId(int id) { this.id = id; }
+
+    public void setSession_id(String session_id) {
         this.session_id = session_id;
     }
 

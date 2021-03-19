@@ -45,9 +45,9 @@ public abstract class SurfSessionDataBase extends RoomDatabase {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            surfSessionDao.insert(new SurfSession("Titel 1", "Description 1", 1));
-            surfSessionDao.insert(new SurfSession("Titel 2", "Description 2", 2));
-            surfSessionDao.insert(new SurfSession("Titel 3", "Description 3", 3));
+            surfSessionDao.insert(new SurfSession("0", "Titel 1", "Description 1", 1));
+            surfSessionDao.insert(new SurfSession("0", "Titel 2", "Description 2", 2));
+            surfSessionDao.insert(new SurfSession("0", "Titel 3", "Description 3", 3));
             return null;
         }
     }

@@ -39,7 +39,7 @@ public class SurfSessionViewModel extends AndroidViewModel {
         repository.deleteAllSurfSessions();
     }
 
-    public LiveData<List<SurfSession>> getAllNotes(){
+    public LiveData<List<SurfSession>> getAllSurfSessions(){
         return allSurfSessions;
     }
 }
