@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,10 +19,12 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.gsurfexample.R;
+import com.example.gsurfexample.source.local.historic.SurfSession;
 import com.example.gsurfexample.source.local.live.ProcessedData;
 import com.example.gsurfexample.source.local.live.TimeSample;
 import com.example.gsurfexample.utils.algorithms.Quaternion;
 import com.example.gsurfexample.utils.factory.ProcessedDataViewModelFactory;
+import com.example.gsurfexample.utils.factory.TestViewModelFactory;
 import com.example.gsurfexample.utils.other.GlobalParams;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.ScatterChart;
@@ -42,10 +45,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class TestActivity extends AppCompatActivity {
 
     public static final int ADD_SURFSESSION_REQUEST = 1;
+    private SurfSessionViewModel surfSessionViewModel;
 
     private ProcessedDataViewModel processedDataViewModel;
     private TextView xValue;
@@ -145,6 +150,18 @@ public class TestActivity extends AppCompatActivity {
         // start thread for frame control of plot
         //startPlot();
 
+
+        // Instantiate and connect surfSessionViewModel to Live Data
+        TestViewModelFactory viewModelFactory;
+        viewModelFactory = new TestViewModelFactory(this.getApplication());
+        surfSessionViewModel = new ViewModelProvider(this, viewModelFactory).get(SurfSessionViewModel.class);
+        surfSessionViewModel.getAllSurfSessions().observe(this, new Observer<List<SurfSession>>() {
+            @Override
+            public void onChanged(@Nullable List<SurfSession> surfSessions) {
+            }
+        });
+
+
         // Instantiate and connect timeSampleViewModel to Live Data
         ProcessedDataViewModelFactory processedDataViewModelFactory;
         processedDataViewModelFactory = new ProcessedDataViewModelFactory(this.getApplication());
@@ -197,28 +214,27 @@ public class TestActivity extends AppCompatActivity {
 
                         // 1st figure
                         //addChartEntry((float)processedData.getX()-xOffset);
-                        if(Math.abs(Math.sqrt(processedData.getDX() * processedData.getDX() +
-                                processedData.getDY() * processedData.getDY()))>200){
+                        if(Math.abs(Math.sqrt(processedData.getDXFilt() * processedData.getDXFilt() +
+                                processedData.getDYFilt() * processedData.getDYFilt()))>200){
                             addChartEntry(0f);
                         }else{
-                            addChartEntry((float)Math.sqrt(processedData.getDX() * processedData.getDX() +
-                                    processedData.getDY() * processedData.getDY()));
+                            addChartEntry((float)Math.sqrt(processedData.getDXFilt() * processedData.getDXFilt() +
+                                    processedData.getDYFilt() * processedData.getDYFilt()));
                         }
 
 
                         // 2nd figure
                         // Caluclate angle from quaternion
-                        /*
                         Quaternion quaternion = new Quaternion(processedData.getQ0(),
                                 processedData.getQ1(), processedData.getQ2(), processedData.getQ3());
-                        addChartEntry2((float)(quaternion.toEulerAngles()[1]/Math.PI*180)); */
-                        if(Math.abs(Math.sqrt(processedData.getDXFilt() * processedData.getDXFilt() +
+                        addChartEntry2((float)(quaternion.toEulerAngles()[2]/Math.PI*180));
+                        /*if(Math.abs(Math.sqrt(processedData.getDXFilt() * processedData.getDXFilt() +
                                 processedData.getDYFilt() * processedData.getDYFilt()))>200){
                             addChartEntry2(0f);
                         }else{
                             addChartEntry2((float)Math.sqrt(processedData.getDXFilt() * processedData.getDXFilt() +
                                     processedData.getDYFilt() * processedData.getDYFilt()));
-                        }
+                        }*/
 
                         plotData();
                         plotData2();
@@ -295,6 +311,25 @@ public class TestActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(processedDataViewModel.getLastProcessedDataSample().getValue() == null){
+            Toast.makeText(this,"No data of session available",Toast.LENGTH_SHORT).show();
+        }else if(requestCode == ADD_SURFSESSION_REQUEST && resultCode == RESULT_OK){
+            String title = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_TITLE);
+            String description = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_DESCRIPTION);
+            int priority = data.getIntExtra(AddEditSurfSessionActivity.EXTRA_PRIORITY, 1);
+            SurfSession surfSession = new SurfSession(
+                    processedDataViewModel.getLastProcessedDataSample().getValue().getSession_id(),
+                    title, description, priority);
+            surfSessionViewModel.insert(surfSession);
+            Toast.makeText(this,"Session saved",Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     @Override
     protected void onDestroy() {
