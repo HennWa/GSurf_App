@@ -26,6 +26,7 @@ import com.example.gsurfexample.utils.algorithms.Quaternion;
 import com.example.gsurfexample.utils.factory.ProcessedDataViewModelFactory;
 import com.example.gsurfexample.utils.factory.TestViewModelFactory;
 import com.example.gsurfexample.utils.other.GlobalParams;
+import com.example.gsurfexample.utils.services.DataRecordManager;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.ScatterChart;
 import com.github.mikephil.charting.components.LimitLine;
@@ -72,6 +73,7 @@ public class TestActivity extends AppCompatActivity {
     ArrayList scatterEntries;
     ArrayList scatterEntries2;
     private ArrayList<ProcessedData> processedDataCache;
+    int plottetDataSize;
 
 
     @Override
@@ -145,10 +147,7 @@ public class TestActivity extends AppCompatActivity {
 
 
         processedDataCache = new ArrayList<ProcessedData>();
-
-
-        // start thread for frame control of plot
-        //startPlot();
+        plottetDataSize = 0;
 
 
         // Instantiate and connect surfSessionViewModel to Live Data
@@ -167,34 +166,92 @@ public class TestActivity extends AppCompatActivity {
         processedDataViewModelFactory = new ProcessedDataViewModelFactory(this.getApplication());
         processedDataViewModel = new ViewModelProvider(this, processedDataViewModelFactory).get(ProcessedDataViewModel.class);
 
+
         // Wennn gesamtes times sample database beobachtet werden soll
-        /*timeSampleViewModel.getAllTimeSamples().observe(this, new Observer<List<TimeSample>>() {
+        processedDataViewModel.getAllProcessedData().observe(this, new Observer<List<ProcessedData>>() {
             @Override
-            public void onChanged(@Nullable List<TimeSample> timeSamples) {
-                if (timeSamples.size() > 0) {
+            public void onChanged(@Nullable List<ProcessedData> processedDataList) {
+                if (processedDataList.size() > 0) {
 
-                    xValue.setText("xValue: " + timeSamples.size());
-                    //float ddx = (float) timeSamples.get(timeSamples.size() - 1).getDdx();
-                    //xValue.setText("xValue: " + ddx);
+                    for(int k = plottetDataSize; k<processedDataList.size(); k++) {
+                        ProcessedData processedData = processedDataList.get(k);
 
-                    // add value to chart
-                    if(plotData) {
+                        if (processedData != null) {
+                            xValue.setText("xValue: " + (float) processedData.getX());
+                            if (xOffset == 0) {
+                                xOffset = (float) processedData.getX();
+                            }
+                            if (yOffset == 0) {
+                                yOffset = (float) processedData.getY();
+                            }
 
+                            // add value to chart
+                            if (true) {   // if plotData
 
-                        //for(int i = mChart.getData().getEntryCount(); i<timeSamples.size(); i++){
-                        //    addChartEntry((float) timeSamples.get(i).getDdx());
+                                // 1st figure
+                                //addChartEntry((float)processedData.getX()-xOffset);
+                                if (Math.abs(Math.sqrt(processedData.getDXFilt() * processedData.getDXFilt() +
+                                        processedData.getDYFilt() * processedData.getDYFilt())) > 50) {
+                                    addChartEntry(0f);
+                                } else {
+                                    addChartEntry((float) Math.sqrt(processedData.getDXFilt() * processedData.getDXFilt() +
+                                            processedData.getDYFilt() * processedData.getDYFilt()));
+                                }
+
+                                // 2nd figure
+                                // Caluclate angle from quaternion
+                                Quaternion quaternion = new Quaternion(processedData.getQ0(),
+                                        processedData.getQ1(), processedData.getQ2(), processedData.getQ3());
+                                addChartEntry2((float) (quaternion.toEulerAngles()[2] / Math.PI * 180));
+                        //if(Math.abs(Math.sqrt(processedData.getDXFilt() * processedData.getDXFilt() +
+                        //        processedData.getDYFilt() * processedData.getDYFilt()))>200){
+                        //    addChartEntry2(0f);
+                        //}else{
+                        //    addChartEntry2((float)Math.sqrt(processedData.getDXFilt() * processedData.getDXFilt() +
+                        //            processedData.getDYFilt() * processedData.getDYFilt()));
                         //}
 
-                        //addChartEntry(ddx);
-                        //addChartEntry(1);
-                        //plotData();
-                    }
+                                //Log.i("TestActivity", "Plottet Data k "  + k + "  "+
+                                //        processedData.getTimeStamp());
 
+                                // 3rd figure Location plot
+                                // here just a cache for now to sort data for plot
+                                processedDataCache.add(processedData);
+                                scatterEntries = new ArrayList<>();
+                                scatterEntries2 = new ArrayList<>();
+                                // sort processdata according to x
+
+                        //Collections.sort(processedDataCache, ProcessedData.xSort);
+                        //for(int i = 0; i<processedDataCache.size(); i++){
+                        //    if(processedDataCache.get(i).getState() == GlobalParams.States.valueOf("FLOATING").ordinal()){
+                        //        scatterEntries.add(new BarEntry((int)(processedDataCache.get(i).getX()-xOffset)*10,   // unit dm
+                        //                (int)((processedDataCache.get(i).getY()-yOffset))*10));
+                        //    }else{
+
+                        //        scatterEntries2.add(new BarEntry((int)(processedDataCache.get(i).getX()-xOffset)*10,   // unit dm
+                        //                (int)((processedDataCache.get(i).getY()-yOffset))*10));
+                        //    }
+                        //}
+                        //plotScatter();
+
+                                // 4th figure
+                                // Velocity plot
+                                addChartVelo((float) processedData.getDXFilt(), (float) processedData.getDYFilt());
+                                plotDataVelo();
+
+                            }
+                        }
+                    }
+                    plotData();
+                    plotData2();
+                    plottetDataSize = processedDataList.size();
                     plotData = false;
+
                 }
             }
-        });*/
+        });
 
+/*
         // Wenn nur letzte pubkt beobachtet werden soll
         processedDataViewModel.getLastProcessedDataSample().observe(this, new Observer<ProcessedData>() {
             @Override
@@ -228,13 +285,16 @@ public class TestActivity extends AppCompatActivity {
                         Quaternion quaternion = new Quaternion(processedData.getQ0(),
                                 processedData.getQ1(), processedData.getQ2(), processedData.getQ3());
                         addChartEntry2((float)(quaternion.toEulerAngles()[2]/Math.PI*180));
-                        /*if(Math.abs(Math.sqrt(processedData.getDXFilt() * processedData.getDXFilt() +
-                                processedData.getDYFilt() * processedData.getDYFilt()))>200){
-                            addChartEntry2(0f);
-                        }else{
-                            addChartEntry2((float)Math.sqrt(processedData.getDXFilt() * processedData.getDXFilt() +
-                                    processedData.getDYFilt() * processedData.getDYFilt()));
-                        }*/
+                        //if(Math.abs(Math.sqrt(processedData.getDXFilt() * processedData.getDXFilt() +
+                        //        processedData.getDYFilt() * processedData.getDYFilt()))>200){
+                        //    addChartEntry2(0f);
+                        //}else{
+                        //    addChartEntry2((float)Math.sqrt(processedData.getDXFilt() * processedData.getDXFilt() +
+                        //            processedData.getDYFilt() * processedData.getDYFilt()));
+                        //}
+
+                        Log.i("TestActivity", "Plottet Data" +
+                                processedData.getTimeStamp());
 
                         plotData();
                         plotData2();
@@ -245,19 +305,19 @@ public class TestActivity extends AppCompatActivity {
                         scatterEntries = new ArrayList<>();
                         scatterEntries2 = new ArrayList<>();
                         // sort processdata according to x
-                        /*
-                        Collections.sort(processedDataCache, ProcessedData.xSort);
-                        for(int i = 0; i<processedDataCache.size(); i++){
-                            if(processedDataCache.get(i).getState() == GlobalParams.States.valueOf("FLOATING").ordinal()){
-                                scatterEntries.add(new BarEntry((int)(processedDataCache.get(i).getX()-xOffset)*10,   // unit dm
-                                        (int)((processedDataCache.get(i).getY()-yOffset))*10));
-                            }else{
 
-                                scatterEntries2.add(new BarEntry((int)(processedDataCache.get(i).getX()-xOffset)*10,   // unit dm
-                                        (int)((processedDataCache.get(i).getY()-yOffset))*10));
-                            }
-                        }
-                        plotScatter(); */
+                        //Collections.sort(processedDataCache, ProcessedData.xSort);
+                        //for(int i = 0; i<processedDataCache.size(); i++){
+                        //    if(processedDataCache.get(i).getState() == GlobalParams.States.valueOf("FLOATING").ordinal()){
+                        //        scatterEntries.add(new BarEntry((int)(processedDataCache.get(i).getX()-xOffset)*10,   // unit dm
+                        //                (int)((processedDataCache.get(i).getY()-yOffset))*10));
+                        //    }else{
+
+                        //        scatterEntries2.add(new BarEntry((int)(processedDataCache.get(i).getX()-xOffset)*10,   // unit dm
+                        //                (int)((processedDataCache.get(i).getY()-yOffset))*10));
+                        //    }
+                        //}
+                        //plotScatter();
 
                         // 4th figure
                         // Velocity plot
@@ -268,7 +328,7 @@ public class TestActivity extends AppCompatActivity {
                     plotData = false;
                 }
             }
-        });
+        }); */
 
         // Button to get back to MainActivity
         FloatingActionButton buttonAddNote2 = findViewById(R.id.button_test2);
@@ -298,6 +358,10 @@ public class TestActivity extends AppCompatActivity {
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                             1);
                 }
+
+                // Test service  //############################################################################
+                Intent intent = new Intent(activityContext, DataRecordManager.class);
+                startService(intent);
             }
         });
 
@@ -308,6 +372,12 @@ public class TestActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(TestActivity.this, AddEditSurfSessionActivity.class);
                 startActivityForResult(intent, ADD_SURFSESSION_REQUEST);
+
+                // Stop service  //############################################################################
+                Intent intent2 = new Intent(activityContext, DataRecordManager.class);
+                startService(intent2);
+
+
             }
         });
     }
@@ -502,7 +572,7 @@ public class TestActivity extends AppCompatActivity {
                 while (true){
                     plotData = true;
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(20);
                     }catch(InterruptedException e){
                         e.printStackTrace();
                     }
