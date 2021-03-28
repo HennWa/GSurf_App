@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int ADD_SURFSESSION_REQUEST = 1;
     public static final int EDIT_SURFSESSION_REQUEST = 2;
     public static final int TEST_REQUEST = 3;
+    public static final int START_SESSION_REQUEST = 3;
     private SurfSessionViewModel surfSessionViewModel;
 
     @Override
@@ -51,6 +53,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, TestActivity.class);
                 startActivityForResult(intent, TEST_REQUEST);
+            }
+        });
+
+        FloatingActionButton buttonStartSession = findViewById(R.id.button_start_session);
+        buttonStartSession.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SessionActivity.class);
+                startActivityForResult(intent, START_SESSION_REQUEST);
             }
         });
 
