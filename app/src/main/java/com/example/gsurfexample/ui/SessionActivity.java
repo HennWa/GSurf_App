@@ -37,23 +37,24 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
 public class SessionActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private ProcessedDataViewModel processedDataViewModel;
+    // Attributes for data access
     private Activity activityContext;
+    private ProcessedDataViewModel processedDataViewModel;
 
-    private ArrayList<ProcessedData> processedDataCache;
-    int plottetDataSize;
+    // Attributes for plotting polylines
+    private int plottedDataSize;
+    private Polyline polyline1;
+    private ArrayList<Polyline> wavePolylines;
 
-    Polyline polyline1;
-    ArrayList<Polyline> wavePolylines;
-
+    // to be deleted...
     Thread thread;
     boolean plotPolyline = false;
-    boolean newLine = true;
 
     // Style parameter
     private static final int POLYLINE_STROKE_WIDTH_PX = 12;
@@ -72,8 +73,8 @@ public class SessionActivity extends AppCompatActivity implements OnMapReadyCall
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        processedDataCache = new ArrayList<ProcessedData>();
-        plottetDataSize = 0;
+        // Initialize state of plots
+        plottedDataSize = 0;
         wavePolylines = new ArrayList<Polyline>();
 
         // Instantiate and connect processedDataViewModel to Live Data
@@ -90,7 +91,7 @@ public class SessionActivity extends AppCompatActivity implements OnMapReadyCall
         if(ContextCompat.checkSelfPermission(activityContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED){
             // Start thread for frame control of plot
-            startPlot();
+            //startPlot();
             // Start sensor data fetch
             processedDataViewModel.sensorDataFetch();
         }else{
@@ -104,83 +105,67 @@ public class SessionActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onChanged(@Nullable List<ProcessedData> processedDataList) {
 
-                if(true){
+                if(true){// to be deleted
                     if (processedDataList.size() > 0) {
 
-                        /*
-                        if(plottetDataSize == 0){
-                            LatLng startPoint = new LatLng(processedDataList.get(0).getLat(),
-                                    processedDataList.get(0).getLon());
-                            // Add polylines to the map.
-                            polyline1 = googleMap.addPolyline(new PolylineOptions()
-                                    .clickable(true)
-                                    .add(startPoint));
-                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 18));
-
-                            // Store a data object with the polyline, used here to indicate an arbitrary type.
-                            polyline1.setTag("A");
-
-                            // Adapt styling
-                            stylePolyline(polyline1);
-
-                            // Store in list
-                            wavePolylines.add(polyline1);
-                        } */
-
-
-
-                        for(int k = plottetDataSize; k<processedDataList.size(); k++) {
+                        for(int k = plottedDataSize; k<processedDataList.size(); k++) {
                             ProcessedData processedData = processedDataList.get(k);
 
                             if (processedData != null) {
 
-                                if(processedData.getState() ==
-                                        GlobalParams.States.valueOf("SURFINGWAVE").ordinal()){
-                                    if(newLine){
+                                Log.i("SessionActivity", "k:   " +  k +  "  State: " +  processedData.getState());
 
-                                        LatLng startPoint = new LatLng(processedDataList.get(k).getLat(),
-                                                processedDataList.get(k).getLon());
-                                        // Add polylines to the map.
-                                        polyline1 = googleMap.addPolyline(new PolylineOptions()
-                                                .clickable(true)
-                                                .add(startPoint));
-                                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 18));
+                                // Check if new data point is of a different type (state)
+                                // if so, plot new ployline
+                                if((polyline1 == null) ||
+                                        (GlobalParams.States.values()[processedData.getState()].toString() !=
+                                        polyline1.getTag().toString())){
 
-                                        // Store a data object with the polyline, used here to indicate an arbitrary type.
-                                        polyline1.setTag("A");
+                                    Log.i("SessionActivity", "State of processed data" + GlobalParams.States.values()[processedData.getState()].toString());
 
-                                        // Adapt styling
-                                        stylePolyline(polyline1);
+                                    //LatLng startPoint = new LatLng(processedData.getLat(),
+                                    //        processedData.getLon());
+                                    // Add polyline to the map.
+                                    polyline1 = googleMap.addPolyline(new PolylineOptions()
+                                            .clickable(true));
+                                            //.add(startPoint));
 
-                                        // Store in list
-                                        wavePolylines.add(polyline1);
-
-                                        newLine = false;
+                                    // Store a data object with the polyline, used here to indicate an arbitrary type.
+                                    switch (GlobalParams.States.values()[processedData.getState()].toString()) {
+                                        // If no type is given, allow the API to use the default.
+                                        case "SURFINGWAVE":
+                                            polyline1.setTag("SURFINGWAVE");
+                                            break;
+                                        case "FLOATING":
+                                            polyline1.setTag("FLOATING");
+                                            break;
                                     }
 
-                                    // Add new entries to last polyline in list
-                                    List<LatLng> pointsPolyline1 = polyline1.getPoints();
-                                    LatLng newPoint = new LatLng(processedData.getLat(),
-                                            processedData.getLon());
-                                    pointsPolyline1.add(newPoint);
-                                    polyline1.setPoints(pointsPolyline1);
-                                }else{
-                                    newLine = true;
+                                    // Adapt styling
+                                    stylePolyline(polyline1);
 
+                                    // Store in list
+                                    wavePolylines.add(polyline1);
                                 }
+
+                                // Add new entries to last polyline in list
+                                List<LatLng> pointsPolyline1 = polyline1.getPoints();
+                                LatLng newPoint = new LatLng(processedData.getLat(),
+                                        processedData.getLon());
+                                pointsPolyline1.add(newPoint);
+                                polyline1.setPoints(pointsPolyline1);
 
                             }
                         }
+
+
                         // move camera after every few points
                         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                 new LatLng(processedDataList.get(processedDataList.size()-1).getLat(),
                                 processedDataList.get(processedDataList.size()-1).getLon()), 18));
-
                     }
-                    plotPolyline = false;
-                    plottetDataSize = processedDataList.size();
+                    plottedDataSize = processedDataList.size();
                 }
-
             }
         });
 
@@ -199,24 +184,29 @@ public class SessionActivity extends AppCompatActivity implements OnMapReadyCall
 
         switch (type) {
             // If no type is given, allow the API to use the default.
-            case "A":
+            case "SURFINGWAVE":
                 // Use a custom bitmap as the cap at the start of the line.
-                polyline.setStartCap(new RoundCap());
+                polyline.setStartCap(
+                        new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.endcap_polyline), 150));
+                polyline.setEndCap(
+                        new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.endcap_polyline), 150));
+                polyline.setWidth(POLYLINE_STROKE_WIDTH_PX);
+                polyline.setColor(getResources().getColor(R.color.light_green));
+                polyline.setJointType(JointType.ROUND);
                 break;
-            case "B":
+            case "FLOATING":
                 // Use a round cap at the start of the line.
-                polyline.setStartCap(new RoundCap());
+                // Use a custom bitmap as the cap at the start of the line.
+                polyline.setStartCap(
+                        new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.endcap_polyline), 150));
+                polyline.setEndCap(
+                        new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.endcap_polyline), 150));
+                polyline.setWidth(POLYLINE_STROKE_WIDTH_PX);
+                polyline.setColor(getResources().getColor(R.color.dark_orange));
+                polyline.setJointType(JointType.ROUND);
                 break;
         }
 
-        //polyline.setEndCap(new RoundCap());
-        polyline.setEndCap(
-                new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.endcap_polyline), 150));
-        polyline.setStartCap(
-                new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.endcap_polyline), 150));
-        polyline.setWidth(POLYLINE_STROKE_WIDTH_PX);
-        polyline.setColor(getResources().getColor(R.color.light_green));
-        polyline.setJointType(JointType.ROUND);
     }
 
     @Override
