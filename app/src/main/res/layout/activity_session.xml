@@ -30,7 +30,7 @@
         <RelativeLayout
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
             android:layout_gravity="center"
             android:background="@android:color/transparent">
 
@@ -42,6 +42,15 @@
                 android:background="@android:color/transparent"/>
 
             <ImageView
+                android:id="@+id/compass_arrow"
+                android:layout_width="40dp"
+                android:layout_height="90dp"
+                app:srcCompat="@drawable/arrow_compass"
+                android:background="@android:color/transparent"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="54dp"/>
+
+            <ImageView
                 android:id="@+id/compass_board"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
@@ -49,10 +58,190 @@
                 android:background="@android:color/transparent"
                 android:layout_marginTop="53dp"
                 android:layout_marginLeft="54dp"/>
-
         </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/first_icon"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="15dp"
+            android:background="@android:color/transparent">
+
+            <ImageView
+                android:id="@+id/first_icon_image"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:srcCompat="@drawable/icon_time"
+                android:background="@android:color/transparent"
+                android:layout_marginLeft="18dp"
+                android:layout_gravity="center_vertical"/>
+
+            <LinearLayout
+                android:id="@+id/first_icon_text"
+                android:layout_height="match_parent"
+                android:layout_width="100dp"
+                android:orientation="vertical"
+                android:background="@android:color/transparent">
+
+                <TextView
+                    android:id="@+id/descrption_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Session Time"
+                    android:textColor="@color/white"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_horizontal"/>
+
+                <TextView
+                    android:id="@+id/value_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="17,4 km/h"
+                    android:textColor="@color/white"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_horizontal"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/second_icon"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="15dp"
+            android:background="@android:color/transparent">
+
+            <ImageView
+                android:id="@+id/second_icon_image"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:srcCompat="@drawable/icon_paddle_distance"
+                android:background="@android:color/transparent"
+                android:layout_marginLeft="18dp"
+                android:layout_gravity="center_vertical"/>
+
+            <LinearLayout
+                android:id="@+id/second_icon_text"
+                android:layout_height="match_parent"
+                android:layout_width="100dp"
+                android:orientation="vertical"
+                android:background="@android:color/transparent">
+
+                <TextView
+                    android:id="@+id/descrption_paddle_distance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Paddled Way"
+                    android:textColor="@color/white"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_horizontal"/>
+
+                <TextView
+                    android:id="@+id/value_paddle_distance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="327 m"
+                    android:textColor="@color/white"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_horizontal"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/third_icon"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="15dp"
+            android:background="@android:color/transparent">
+
+            <ImageView
+                android:id="@+id/third_icon_image"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:srcCompat="@drawable/icon_counter"
+                android:background="@android:color/transparent"
+                android:layout_marginLeft="18dp"
+                android:layout_gravity="center_vertical"/>
+
+            <LinearLayout
+                android:id="@+id/third_icon_text"
+                android:layout_height="match_parent"
+                android:layout_width="100dp"
+                android:orientation="vertical"
+                android:background="@android:color/transparent">
+
+                <TextView
+                    android:id="@+id/descrption_wave_counter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Waves Surfed"
+                    android:textColor="@color/white"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_horizontal"/>
+
+                <TextView
+                    android:id="@+id/value_number_of_waves"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="12"
+                    android:textColor="@color/white"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="center_horizontal"/>
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/record_symbol"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        app:srcCompat="@drawable/symbol_record"
+        android:layout_marginLeft="600dp"
+        android:layout_marginTop="30dp"
+        android:background="@android:color/transparent"/>
+
+    <ImageView
+        android:id="@+id/stop_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:srcCompat="@drawable/icon_stop_button"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp"
+        android:background="@android:color/transparent"/>
+
+    <RadioButton
+        android:id="@+id/toggle_waves"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Waves "
+        android:textColor="@color/white"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="30dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="70dp"/>
+
+    <RadioButton
+        android:id="@+id/toggle_paddle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Paddle"
+        android:textColor="@color/white"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="30dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="25dp"/>
+
 </RelativeLayout>
+
 
 
 

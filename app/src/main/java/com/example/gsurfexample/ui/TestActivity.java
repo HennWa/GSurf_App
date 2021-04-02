@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +53,7 @@ public class TestActivity extends AppCompatActivity {
 
     public static final int ADD_SURFSESSION_REQUEST = 1;
     private SurfSessionViewModel surfSessionViewModel;
+    private String sessionID;
 
     private ProcessedDataViewModel processedDataViewModel;
     private TextView xValue;
@@ -150,6 +152,7 @@ public class TestActivity extends AppCompatActivity {
         plottetDataSize = 0;
 
 
+
         // Instantiate and connect surfSessionViewModel to Live Data
         TestViewModelFactory viewModelFactory;
         viewModelFactory = new TestViewModelFactory(this.getApplication());
@@ -172,6 +175,11 @@ public class TestActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable List<ProcessedData> processedDataList) {
                 if (processedDataList.size() > 0) {
+
+                    if(plottetDataSize==0){
+                        sessionID = processedDataList.get(processedDataList.size()-1).
+                                getSession_id();
+                    }
 
                     for(int k = plottetDataSize; k<processedDataList.size(); k++) {
                         ProcessedData processedData = processedDataList.get(k);
@@ -373,7 +381,7 @@ public class TestActivity extends AppCompatActivity {
                 Intent intent = new Intent(TestActivity.this, AddEditSurfSessionActivity.class);
                 startActivityForResult(intent, ADD_SURFSESSION_REQUEST);
 
-                // Stop service  //############################################################################
+                // Start and Stop service  //############################################################################
                 Intent intent2 = new Intent(activityContext, DataRecordManager.class);
                 startService(intent2);
 
@@ -386,15 +394,13 @@ public class TestActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(processedDataViewModel.getLastProcessedDataSample().getValue() == null){
+        if(sessionID == null){
             Toast.makeText(this,"No data of session available",Toast.LENGTH_SHORT).show();
         }else if(requestCode == ADD_SURFSESSION_REQUEST && resultCode == RESULT_OK){
             String title = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_TITLE);
             String description = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_DESCRIPTION);
             int priority = data.getIntExtra(AddEditSurfSessionActivity.EXTRA_PRIORITY, 1);
-            SurfSession surfSession = new SurfSession(
-                    processedDataViewModel.getLastProcessedDataSample().getValue().getSession_id(),
-                    title, description, priority);
+            SurfSession surfSession = new SurfSession(sessionID, title, description, priority);
             surfSessionViewModel.insert(surfSession);
             Toast.makeText(this,"Session saved",Toast.LENGTH_SHORT).show();
         }

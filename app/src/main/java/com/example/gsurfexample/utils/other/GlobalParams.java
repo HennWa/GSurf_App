@@ -6,6 +6,9 @@ public class GlobalParams {
 
     private static GlobalParams instance;
 
+    // General
+    public float eps = 1e-6f;
+
     // ResampleFilter
     public final long sampleR = 100;  // [ms]
     public final float sampleRs = sampleR/1e3f;  // [s]

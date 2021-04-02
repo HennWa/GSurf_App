@@ -3,12 +3,19 @@ package com.example.gsurfexample.ui;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.style.StyleSpan;
 import android.util.Log;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,10 +26,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.gsurfexample.R;
 
+import com.example.gsurfexample.source.local.historic.SurfSession;
 import com.example.gsurfexample.source.local.live.ProcessedData;
 import com.example.gsurfexample.utils.algorithms.Quaternion;
 import com.example.gsurfexample.utils.factory.ProcessedDataViewModelFactory;
+import com.example.gsurfexample.utils.factory.TestViewModelFactory;
 import com.example.gsurfexample.utils.other.GlobalParams;
+import com.example.gsurfexample.utils.services.DataRecordManager;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -43,6 +53,11 @@ import java.util.List;
 
 public class SessionActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    // Attributes for session handling
+    public static final int ADD_SURFSESSION_REQUEST = 1;
+    private SurfSessionViewModel surfSessionViewModel;
+    private String sessionID;
+
     // Attributes for data access
     private Activity activityContext;
     private ProcessedDataViewModel processedDataViewModel;
@@ -52,6 +67,14 @@ public class SessionActivity extends AppCompatActivity implements OnMapReadyCall
     private Polyline polyline1;
     private ArrayList<Polyline> wavePolylines;
 
+    // plot sidebar
+    private ImageView compassRose;
+    private ImageView compassArrow;
+    private ImageView stopButton;
+    private float psi;
+    private float vAbs;
+    private float rotationAngleDegArrowCompass;
+
     // to be deleted...
     Thread thread;
     boolean plotPolyline = false;
@@ -59,23 +82,53 @@ public class SessionActivity extends AppCompatActivity implements OnMapReadyCall
     // Style parameter
     private static final int POLYLINE_STROKE_WIDTH_PX = 12;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session);
 
-        // activity context
+        // Styling
+        getSupportActionBar().hide();  // hide title bar
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
+        // Activity context
         activityContext = this;
 
-        // mapFragment for google map
+        //Get image views
+        compassRose = (ImageView)findViewById(R.id.compass_rose);
+        compassArrow = (ImageView)findViewById(R.id.compass_arrow);
+
+        // Map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        // Stop button
+        stopButton = (ImageView)findViewById(R.id.stop_button);
+        stopButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+                processedDataViewModel.stopSensorDataFetch();
+
+                Intent intent = new Intent(SessionActivity.this, AddEditSurfSessionActivity.class);
+                startActivityForResult(intent, ADD_SURFSESSION_REQUEST);
+
+                // Stop service  //############################################################################
+                //Intent intent2 = new Intent(activityContext, DataRecordManager.class);
+                //startService(intent2);
+            }
+        });
+
         // Initialize state of plots
         plottedDataSize = 0;
         wavePolylines = new ArrayList<Polyline>();
+
+        // Instantiate and connect surfSessionViewModel to Live Data
+        TestViewModelFactory viewModelFactory;
+        viewModelFactory = new TestViewModelFactory(this.getApplication());
+        surfSessionViewModel = new ViewModelProvider(this, viewModelFactory).get(SurfSessionViewModel.class);
 
         // Instantiate and connect processedDataViewModel to Live Data
         ProcessedDataViewModelFactory processedDataViewModelFactory;
@@ -108,7 +161,13 @@ public class SessionActivity extends AppCompatActivity implements OnMapReadyCall
                 if(true){// to be deleted
                     if (processedDataList.size() > 0) {
 
+                        if(plottedDataSize==0){
+                            sessionID = processedDataList.get(processedDataList.size()-1).
+                                    getSession_id();
+                        }
+
                         for(int k = plottedDataSize; k<processedDataList.size(); k++) {
+
                             ProcessedData processedData = processedDataList.get(k);
 
                             if (processedData != null) {
@@ -155,9 +214,32 @@ public class SessionActivity extends AppCompatActivity implements OnMapReadyCall
                                 pointsPolyline1.add(newPoint);
                                 polyline1.setPoints(pointsPolyline1);
 
+                                // Rotate compass rose
+                                psi = (float)(new Quaternion(processedData.getQ0(),
+                                        processedData.getQ1(), processedData.getQ2(),
+                                        processedData.getQ3()).toEulerAngles()[2] / Math.PI * 180);
+                                compassRose.setRotation(psi); // function requires clockwise rotation
+
+                                // Update arrow of image view
+                                vAbs = (float)Math.sqrt((processedData.getDYFilt()*
+                                        processedData.getDYFilt() +
+                                        processedData.getDXFilt()*processedData.getDXFilt()));
+
+                                if(Math.abs(vAbs) < GlobalParams.getInstance().eps){
+                                    rotationAngleDegArrowCompass = 0;
+                                }else{
+                                    rotationAngleDegArrowCompass =
+                                            (float)(Math.asin(processedData.getDYFilt()/vAbs)
+                                                    / Math.PI * 180
+                                                    -psi);
+                                }
+                                compassArrow.setRotation(rotationAngleDegArrowCompass); // function requires clockwise rotation
+                                int width = 40;
+                                int height = 90;
+                                LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(width,height);
+                                //iv.setLayoutParams(parms);
                             }
                         }
-
 
                         // move camera after every few points
                         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
@@ -207,6 +289,28 @@ public class SessionActivity extends AppCompatActivity implements OnMapReadyCall
                 break;
         }
 
+    }
+
+    /**
+     * Store session data in session db.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(sessionID == null){
+            Toast.makeText(this,"No data of session available",Toast.LENGTH_SHORT).show();
+        }else if(requestCode == ADD_SURFSESSION_REQUEST && resultCode == RESULT_OK){
+            String title = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_TITLE);
+            String description = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_DESCRIPTION);
+            int priority = data.getIntExtra(AddEditSurfSessionActivity.EXTRA_PRIORITY, 1);
+            SurfSession surfSession = new SurfSession(sessionID,
+                    title, description, priority);
+            surfSessionViewModel.insert(surfSession);
+            Toast.makeText(this,"Session saved",Toast.LENGTH_SHORT).show();
+        } else{
+            Toast.makeText(this,"Failed to save session",Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

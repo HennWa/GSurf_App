@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.gsurfexample.R;
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton buttonStartSession = findViewById(R.id.button_start_session);
+        ImageView buttonStartSession = findViewById(R.id.button_start_session);
         buttonStartSession.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -148,6 +149,8 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this,"Nothing happens",Toast.LENGTH_SHORT).show();
         }
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

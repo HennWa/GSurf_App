@@ -31,20 +31,25 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_add"
         android:layout_gravity="bottom|end"
-        android:layout_margin="32dp"/>
+        android:layout_margin="32dp"
+        android:backgroundTint="@color/water_blue"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_test"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/button_add_session"
-        android:layout_margin="32dp"/>
+        android:layout_margin="32dp"
+        android:backgroundTint="@color/water_blue"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <ImageView
         android:id="@+id/button_start_session"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:srcCompat="@drawable/icon_start_button"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp"
+        android:background="@android:color/transparent"/>
 
 </RelativeLayout>
