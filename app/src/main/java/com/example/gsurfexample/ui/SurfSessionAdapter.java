@@ -3,6 +3,9 @@ package com.example.gsurfexample.ui;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,6 +83,11 @@ public class SurfSessionAdapter extends ListAdapter<SurfSession, SurfSessionAdap
             textViewDescription = itemView.findViewById(R.id.text_view_description);
             textViewPriority = itemView.findViewById(R.id.text_view_priority);
             imageSession = itemView.findViewById(R.id.image_view_session);
+
+            Shader textShader=new LinearGradient(40, 0, 0, 20,
+                    new int[]{Color.GREEN, Color.BLUE},
+                    new float[]{0, 1}, Shader.TileMode.CLAMP);
+            textViewTitle.getPaint().setShader(textShader);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
