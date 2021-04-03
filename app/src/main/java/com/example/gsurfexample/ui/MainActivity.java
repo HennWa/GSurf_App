@@ -106,8 +106,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, AddEditSurfSessionActivity.class);
                 intent.putExtra(AddEditSurfSessionActivity.EXTRA_ID, surfSession.getId());
                 intent.putExtra(AddEditSurfSessionActivity.EXTRA_TITLE, surfSession.getTitle());
-                intent.putExtra(AddEditSurfSessionActivity.EXTRA_DESCRIPTION, surfSession.getDescription());
-                intent.putExtra(AddEditSurfSessionActivity.EXTRA_PRIORITY, surfSession.getPriority());
+                intent.putExtra(AddEditSurfSessionActivity.EXTRA_LOCATION, surfSession.getLocation());
+                intent.putExtra(AddEditSurfSessionActivity.EXTRA_DATE, surfSession.getDate());
                 startActivityForResult(intent, EDIT_SURFSESSION_REQUEST);
             }
         });
@@ -120,10 +120,10 @@ public class MainActivity extends AppCompatActivity {
 
         if(requestCode == ADD_SURFSESSION_REQUEST && resultCode == RESULT_OK){
             String title = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_TITLE);
-            String description = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_DESCRIPTION);
-            int priority = data.getIntExtra(AddEditSurfSessionActivity.EXTRA_PRIORITY, 1);
+            String description = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_LOCATION);
+            String date = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_DATE);
 
-            SurfSession surfSession = new SurfSession("0", title, description, priority);
+            SurfSession surfSession = new SurfSession("0", title, description, date);
             surfSessionViewModel.insert(surfSession);
 
             Toast.makeText(this,"Session saved",Toast.LENGTH_SHORT).show();
@@ -136,21 +136,18 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             String title = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_TITLE);
-            String description = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_DESCRIPTION);
-            int priority = data.getIntExtra(AddEditSurfSessionActivity.EXTRA_PRIORITY, 1);
+            String description = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_LOCATION);
+            String date = data.getStringExtra(AddEditSurfSessionActivity.EXTRA_DATE);
 
-            SurfSession surfSession = new SurfSession("0", title, description, priority);
+            SurfSession surfSession = new SurfSession("0", title, description, date);
             surfSession.setId(id);
             surfSessionViewModel.update(surfSession);
 
             Toast.makeText(this,"Session updated",Toast.LENGTH_SHORT).show();
-
         } else{
             Toast.makeText(this,"Nothing happens",Toast.LENGTH_SHORT).show();
         }
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

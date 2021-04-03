@@ -12,16 +12,16 @@ public class SurfSession {
     private int id;
     private String sessionID;
     private String title;
-    private String description;
-    private int priority;
+    private String location;
+    private String date;
     //private Bitmap image;
 
 
-    public SurfSession(String sessionID, String title, String description, int priority) {
+    public SurfSession(String sessionID, String title, String location, String date) {
         this.sessionID = sessionID;
         this.title = title;
-        this.description = description;
-        this.priority = priority;
+        this.location = location;
+        this.date = date;
     }
 
     public void setSessionID(String sessionID) { this.sessionID = sessionID; }
@@ -40,12 +40,12 @@ public class SurfSession {
         return title;
     }
 
-    public String getDescription() {
-        return description;
+    public String getLocation() {
+        return location;
     }
 
-    public int getPriority() {
-        return priority;
+    public String getDate() {
+        return date;
     }
 
     //public Bitmap getImage(){ return image; }

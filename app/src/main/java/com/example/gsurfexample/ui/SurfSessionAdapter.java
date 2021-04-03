@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,8 +40,8 @@ public class SurfSessionAdapter extends ListAdapter<SurfSession, SurfSessionAdap
         @Override
         public boolean areContentsTheSame(@NonNull SurfSession oldItem, @NonNull SurfSession newItem) {
             return oldItem.getTitle().equals(newItem.getTitle()) &&
-                    oldItem.getDescription().equals(newItem.getDescription()) &&
-                    oldItem.getPriority() == newItem.getPriority();
+                    oldItem.getLocation().equals(newItem.getLocation()) &&
+                    oldItem.getDate().equals(newItem.getDate());
         }
     };
 
@@ -56,8 +57,8 @@ public class SurfSessionAdapter extends ListAdapter<SurfSession, SurfSessionAdap
     public void onBindViewHolder(@NonNull SurfSessionHolder holder, int position) {
         SurfSession currentSurfSession = getItem(position);
         holder.textViewTitle.setText(currentSurfSession.getTitle());
-        holder.textViewDescription.setText(currentSurfSession.getDescription());
-        holder.textViewPriority.setText(String.valueOf(currentSurfSession.getPriority()));
+        holder.textViewLocation.setText(currentSurfSession.getLocation());
+        holder.textViewDate.setText(String.valueOf(currentSurfSession.getDate()));
         holder.imageSession.setImageBitmap(getBitmapfromDrawable(R.drawable.test_image));
     }
 
@@ -73,19 +74,20 @@ public class SurfSessionAdapter extends ListAdapter<SurfSession, SurfSessionAdap
 
     class SurfSessionHolder extends RecyclerView.ViewHolder{
         private TextView textViewTitle;
-        private TextView textViewDescription;
-        private TextView textViewPriority;
+        private TextView textViewLocation;
+        private TextView textViewDate;
         private ImageView imageSession;
 
         public SurfSessionHolder(View itemView){
             super(itemView);
             textViewTitle = itemView.findViewById(R.id.text_view_title);
-            textViewDescription = itemView.findViewById(R.id.text_view_description);
-            textViewPriority = itemView.findViewById(R.id.text_view_priority);
+            textViewLocation = itemView.findViewById(R.id.text_view_location);
+            textViewDate = itemView.findViewById(R.id.text_view_date);
             imageSession = itemView.findViewById(R.id.image_view_session);
 
-            Shader textShader=new LinearGradient(40, 0, 0, 20,
-                    new int[]{Color.GREEN, Color.BLUE},
+            Shader textShader = new LinearGradient(0, 0, 0, 100,
+                    new int[]{ContextCompat.getColor(context, R.color.light_blue_transition),
+                            ContextCompat.getColor(context, R.color.water_blue)},
                     new float[]{0, 1}, Shader.TileMode.CLAMP);
             textViewTitle.getPaint().setShader(textShader);
 

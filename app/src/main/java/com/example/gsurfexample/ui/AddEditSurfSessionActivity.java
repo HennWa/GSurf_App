@@ -13,19 +13,20 @@ import android.widget.Toast;
 
 import com.example.gsurfexample.R;
 
+import java.util.Calendar;
+
 public class AddEditSurfSessionActivity extends AppCompatActivity {
     public static final String EXTRA_ID =
             "com.example.architectureexample.EXTRA_ID";
     public static final String EXTRA_TITLE =
             "com.example.architectureexample.EXTRA_TITLE";
-    public static final String EXTRA_DESCRIPTION =
+    public static final String EXTRA_LOCATION =
             "com.example.architectureexample.EXTRA_DESCRIPTION";
-    public static final String EXTRA_PRIORITY =
+    public static final String EXTRA_DATE =
             "com.example.architectureexample.EXTRA_PRIORITY";
 
     private EditText editTextTitle;
-    private EditText editTextDescription;
-    private NumberPicker numberPickerPriority;
+    private EditText editTextLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,11 +34,7 @@ public class AddEditSurfSessionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_surfsession);
 
         editTextTitle = findViewById(R.id.edit_text_title);
-        editTextDescription = findViewById(R.id.edit_text_description);
-        numberPickerPriority = findViewById(R.id.number_picker_priotity);
-
-        numberPickerPriority.setMinValue(1);
-        numberPickerPriority.setMaxValue(10);
+        editTextLocation = findViewById(R.id.edit_text_location);
 
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
@@ -46,8 +43,7 @@ public class AddEditSurfSessionActivity extends AppCompatActivity {
         if(intent.hasExtra(EXTRA_ID)){
             setTitle("Edit Surf Session");
             editTextTitle.setText(intent.getStringExtra(EXTRA_TITLE));
-            editTextDescription.setText(intent.getStringExtra(EXTRA_DESCRIPTION));
-            numberPickerPriority.setValue(intent.getIntExtra(EXTRA_PRIORITY, 1));
+            editTextLocation.setText(intent.getStringExtra(EXTRA_LOCATION));
         } else{
             setTitle("Add Surf Session");
         }
@@ -55,18 +51,18 @@ public class AddEditSurfSessionActivity extends AppCompatActivity {
 
     private void saveSurfSession(){
         String title = editTextTitle.getText().toString();
-        String description = editTextDescription.getText().toString();
-        int priority = numberPickerPriority.getValue();
+        String location = editTextLocation.getText().toString();
+        String date = Calendar.getInstance().getTime().toString();
 
-        if(title.trim().isEmpty() || description.trim().isEmpty()){
+        if(title.trim().isEmpty() || location.trim().isEmpty()){
             Toast.makeText(this, "Please insert a title and a description", Toast.LENGTH_SHORT).show();
             return;
         }
 
         Intent data = new Intent();
         data.putExtra(EXTRA_TITLE, title);
-        data.putExtra(EXTRA_DESCRIPTION, description);
-        data.putExtra(EXTRA_PRIORITY, priority);
+        data.putExtra(EXTRA_LOCATION, location);
+        data.putExtra(EXTRA_DATE, date);
 
         int id = getIntent().getIntExtra(EXTRA_ID, -1);
         if(id != -1){

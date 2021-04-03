@@ -26,7 +26,7 @@ public interface SurfSessionDao {
     @Query("DELETE FROM session_table")
     void deleteAllNotes();
 
-    @Query("SELECT * FROM session_table ORDER BY priority DESC")
+    @Query("SELECT * FROM session_table ORDER BY date DESC")
     LiveData<List<SurfSession>> getAllNotes();
 
 }

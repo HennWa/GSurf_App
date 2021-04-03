@@ -31,6 +31,8 @@
     <color name="dark_blue_grey">#242437</color>
     <color name="blue_grey">#2F2D42</color>
     <color name="light_blue_grey">#39374C</color>
-    <color name="water_blue">#00B0F0</color>
+    <color name="super_light_blue_grey">#47455C</color>
     <color name="blue_grey_50per_opacity">#802F2D42</color>
+    <color name="water_blue">#00B0F0</color>
+    <color name="light_blue_transition">#00EEDD</color>
 </resources>

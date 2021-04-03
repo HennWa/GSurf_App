@@ -45,7 +45,10 @@
             android:parentActivityName="com.example.gsurfexample.ui.MainActivity"/>
 
         <activity android:name="com.example.gsurfexample.ui.MainActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:icon="@drawable/icon2"
+            android:label="GSurf">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

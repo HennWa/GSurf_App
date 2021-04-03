@@ -9,21 +9,9 @@
     <RelativeLayout
         android:id="@+id/item_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="380dp"
         android:padding="0dp"
         android:background="@color/blue_grey">
-
-        <TextView
-            android:id="@+id/text_view_priority"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:paddingRight="8dp"
-            android:layout_alignParentEnd="true"
-            android:text="1"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="@color/white"
-            android:background="@android:color/transparent"/>
 
         <TextView
             android:id="@+id/text_view_title"
@@ -34,19 +22,19 @@
             android:text="Title"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:maxLines="1"
-            android:layout_toStartOf="@id/text_view_priority"
             android:layout_alignParentStart="true"
             android:ellipsize="end"
             android:textColor="@color/water_blue"
             android:background="@android:color/transparent"/>
 
         <TextView
-            android:id="@+id/text_view_description"
+            android:id="@+id/text_view_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="5dp"
             android:paddingLeft="8dp"
             android:layout_below="@id/text_view_title"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:text="Description"
             android:textColor="@color/white"
             android:background="@android:color/transparent"/>
@@ -57,7 +45,8 @@
             android:layout_height="wrap_content"
             android:paddingTop="5dp"
             android:paddingLeft="8dp"
-            android:layout_below="@id/text_view_description"
+            android:layout_below="@id/text_view_location"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:text="Description"
             android:textColor="@color/white"
             android:background="@android:color/transparent"/>
@@ -65,7 +54,7 @@
         <ImageView
             android:id="@+id/image_view_session"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="match_parent"
             android:layout_below="@id/text_view_date"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"/>

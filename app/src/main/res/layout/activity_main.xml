@@ -15,8 +15,9 @@
         android:background="@color/blue_grey"
         android:textColor="@color/white"
         android:gravity="center"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp"/>
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -25,22 +26,12 @@
         android:layout_below="@+id/session_menu"
         tools:listitem="@layout/surfsession_item"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_add_session"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_add"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="32dp"
-        android:backgroundTint="@color/water_blue"/>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_test"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/button_add_session"
-        android:layout_margin="32dp"
-        android:backgroundTint="@color/water_blue"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/lower_bar"
+        android:background="@color/blue_grey"
+        android:layout_alignParentBottom="true"/>
 
     <ImageView
         android:id="@+id/button_start_session"
@@ -51,5 +42,22 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="25dp"
         android:background="@android:color/transparent"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_add_session"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_add"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:backgroundTint="@color/water_blue"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/water_blue"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"/>
 
 </RelativeLayout>
