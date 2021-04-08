@@ -14,9 +14,9 @@ import java.util.List;
 public class ProcessedDataViewModel extends AndroidViewModel {
 
     // Attributes
-    private ProcessedDataRepository repository;
-    private LiveData<ProcessedData> lastProcessedDataSample;
-    private LiveData<List<ProcessedData>> allProcessedData;
+    private final ProcessedDataRepository repository;
+    private final LiveData<ProcessedData> lastProcessedDataSample;
+    private final LiveData<List<ProcessedData>> allProcessedData;
 
     // Constructor
     public ProcessedDataViewModel(@NonNull Application application) {
@@ -55,8 +55,12 @@ public class ProcessedDataViewModel extends AndroidViewModel {
         return allProcessedData;
     }
 
-    public LiveData<ProcessedData> getLastProcessedDataSample(){
-        return lastProcessedDataSample;
+    public List<ProcessedData> getAllProcessedDataSync() throws Exception{
+        return repository.getAllProcessedDataSync();
     }
+
+    //public LiveData<ProcessedData> getLastProcessedDataSample(){
+    //    return lastProcessedDataSample;
+    //}
 
 }

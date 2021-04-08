@@ -136,6 +136,34 @@ public class ProcessedDataRepository {
         }
     }
 
+    /**
+     * Nested class InsertProcessedDataAsyncTask provides insert operation.
+     */
+    private static class GetAllProcessedDataSyncAsyncTask extends AsyncTask<Void, Void, List<ProcessedData>> {
+        private ProcessedDataDao processedDataDao;
+
+        /**
+         * Constructor.
+         * @param processedDataDao Dao for connecting to database
+         */
+        private GetAllProcessedDataSyncAsyncTask(ProcessedDataDao processedDataDao){
+            this.processedDataDao = processedDataDao;
+        }
+
+        /**
+         * Get all data as list.
+         */
+        @Override
+        protected List<ProcessedData> doInBackground(Void... voids) {
+            return processedDataDao.getAllProcessedDataSync();
+        }
+
+        @Override
+        protected  void onPostExecute(List<ProcessedData> result) {
+        }
+    }
+
+
     // Methods
     /**
      * Triggers the fetching of sensor and location sensor data by instantiating a new
@@ -197,6 +225,14 @@ public class ProcessedDataRepository {
      */
     public LiveData<List<ProcessedData>> getAllProcessedData() {
         return allProcessedData;
+    }
+
+    /**
+     * Get all data in database.
+     * @return Data in database as List.
+     */
+    public List<ProcessedData> getAllProcessedDataSync() throws Exception {
+        return new GetAllProcessedDataSyncAsyncTask(processedDataDao).execute().get();
     }
 
     /**

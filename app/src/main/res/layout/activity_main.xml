@@ -43,21 +43,28 @@
         android:layout_marginBottom="25dp"
         android:background="@android:color/transparent"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <ImageView
         android:id="@+id/button_add_session"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_add"
+        app:srcCompat="@drawable/icon_upload"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:backgroundTint="@color/water_blue"/>
+        android:layout_marginBottom="25dp"
+        android:layout_marginRight="40dp"
+        android:backgroundTint="@color/water_blue"
+        android:background="@android:color/transparent"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <ImageView
         android:id="@+id/button_test"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/icon_share"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:backgroundTint="@color/water_blue"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"/>
+        android:layout_marginBottom="25dp"
+        android:layout_marginLeft="40dp"
+        android:layout_alignParentLeft="true"
+        android:background="@android:color/transparent"/>
 
 </RelativeLayout>

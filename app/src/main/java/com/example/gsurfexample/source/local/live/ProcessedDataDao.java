@@ -28,8 +28,12 @@ public interface ProcessedDataDao {
     @Query("SELECT * FROM processed_data_table")
     LiveData<List<ProcessedData>> getAllProcessedData();
 
+    @Query("SELECT * FROM processed_data_table")
+    List<ProcessedData> getAllProcessedDataSync();
+
     @Query("SELECT * FROM processed_data_table ORDER BY timeStamp DESC LIMIT 1")
     LiveData<ProcessedData> getLastProcessedData();
+
 
     //@Query("SELECT * FROM processed_data_table WHERE id = :id")
     //ProcessedData getProcessedDataSamplesById(int id);

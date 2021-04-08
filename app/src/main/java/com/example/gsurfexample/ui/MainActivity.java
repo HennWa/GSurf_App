@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FloatingActionButton buttonAddSession = findViewById(R.id.button_add_session);
+        ImageView buttonAddSession = findViewById(R.id.button_add_session);
         buttonAddSession.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton buttonTest = findViewById(R.id.button_test);
+        ImageView buttonTest = findViewById(R.id.button_test);
         buttonTest.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {

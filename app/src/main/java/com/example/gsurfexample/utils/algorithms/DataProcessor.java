@@ -21,7 +21,7 @@ import java.util.UUID;
  */
 public class DataProcessor {
 
-    private String sessionID;
+    private final String sessionID;
     private final GlobalParams globalParams;
     private int intervalStepCount;
     private int sampleCount;
