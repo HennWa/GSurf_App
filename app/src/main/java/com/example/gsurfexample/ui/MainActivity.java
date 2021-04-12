@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,9 +20,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.gsurfexample.R;
+import com.example.gsurfexample.source.local.historic.ProcessedDataHistoric;
+import com.example.gsurfexample.utils.factory.ProcessedDataHistoricViewModelFactory;
+import com.example.gsurfexample.utils.factory.ProcessedDataViewModelFactory;
 import com.example.gsurfexample.utils.factory.TestViewModelFactory;
 import com.example.gsurfexample.source.local.historic.SurfSession;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
@@ -33,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     public static final int TEST_REQUEST = 3;
     public static final int START_SESSION_REQUEST = 3;
     private SurfSessionViewModel surfSessionViewModel;
+    private ProcessedDataViewModel processedDataViewModel;
+    private ProcessedDataHistoricViewModel processedDataHistoricViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +89,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Instantiate and connect processedDataViewModel to Live Data
+        ProcessedDataViewModelFactory processedDataViewModelFactory;
+        processedDataViewModelFactory = new ProcessedDataViewModelFactory(this.getApplication());
+        processedDataViewModel = new ViewModelProvider(this, processedDataViewModelFactory).
+                get(ProcessedDataViewModel.class);
 
+        // Instantiate and connect processedDataHistoricViewModel
+        ProcessedDataHistoricViewModelFactory processedDataHistoricViewModelFactory;
+        processedDataHistoricViewModelFactory = new ProcessedDataHistoricViewModelFactory(
+                this.getApplication());
+        processedDataHistoricViewModel = new ViewModelProvider(this,
+                processedDataHistoricViewModelFactory).get(ProcessedDataHistoricViewModel.class);
+
+        // Touch helper for recyclerview
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
@@ -103,12 +120,30 @@ public class MainActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(new SurfSessionAdapter.onItemClickListener() {
             @Override
             public void onItemClick(SurfSession surfSession) {
-                Intent intent = new Intent(MainActivity.this, AddEditSurfSessionActivity.class);
-                intent.putExtra(AddEditSurfSessionActivity.EXTRA_ID, surfSession.getId());
-                intent.putExtra(AddEditSurfSessionActivity.EXTRA_TITLE, surfSession.getTitle());
-                intent.putExtra(AddEditSurfSessionActivity.EXTRA_LOCATION, surfSession.getLocation());
-                intent.putExtra(AddEditSurfSessionActivity.EXTRA_DATE, surfSession.getDate());
-                startActivityForResult(intent, EDIT_SURFSESSION_REQUEST);
+
+                // Load data from backend db into room db
+                try{
+                    List<ProcessedDataHistoric> sessionData =
+                            processedDataHistoricViewModel.
+                                    getProcessedDataHistoricSyncBySessionsId(surfSession.getSessionID());
+                    for(int i=0; i<sessionData.size(); i++){
+                        Log.i("MainActivity", "NUmber of data safed + ----" + i);
+                        processedDataViewModel.insert(sessionData.get(i));
+                    }
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+
+
+
+
+                // Here change to session detail view!
+
+
+
+
             }
         });
 

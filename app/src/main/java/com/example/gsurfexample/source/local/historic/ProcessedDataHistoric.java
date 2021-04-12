@@ -1,74 +1,45 @@
-package com.example.gsurfexample.source.local.live;
+package com.example.gsurfexample.source.local.historic;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.example.gsurfexample.source.local.historic.ProcessedDataHistoric;
+import com.example.gsurfexample.source.local.live.ProcessedData;
 
 import java.util.Comparator;
 
-@Entity(tableName = "processed_data_table")
-public class ProcessedData {
-
-    @PrimaryKey(autoGenerate = true)
-    public int id;
-    public String session_id;
-    public long timeStamp;
-    public float ddX, ddY, ddZ;
-    public double dX, dY, dZ;
-    public double X, Y, Z;
-    public double dXFilt, dYFilt;
-    public float wx, wy, wz;
-    public float q0, q1, q2, q3; // quaternions
-    public double lat, lon;
-    public int state;
-
-    public ProcessedData(String session_id, long timeStamp,
-                         float ddX, float ddY, float ddZ,
-                         double dX, double dY, double dZ,
-                         double X, double Y, double Z,
-                         double dXFilt, double dYFilt,
-                         float wx, float wy, float wz,
-                         float q0, float q1, float q2, float q3,
-                         double lat, double lon, int state) {
+@Entity(tableName = "processed_data_historic_table")
+public class ProcessedDataHistoric extends ProcessedData {
 
 
-        this.session_id = session_id;
-        this.timeStamp = timeStamp;         // in milliseconds
-        this.ddX = ddX;
-        this.ddY = ddY;
-        this.ddZ = ddZ;
-        this.dX = dX;
-        this.dY = dY;
-        this.dZ = dZ;
-        this.X = X;
-        this.Y = Y;
-        this.Z = Z;
-        this.dXFilt = dXFilt;
-        this.dYFilt = dYFilt;
-        this.wx = wx;
-        this.wy = wy;
-        this.wz = wz;
-        this.q0 = q0;
-        this.q1 = q1;
-        this.q2 = q2;
-        this.q3 = q3;
-        this.lat = lat;
-        this.lon = lon;
-        this.state = state;
+    public ProcessedDataHistoric(String session_id, long timeStamp,
+                                 float ddX, float ddY, float ddZ,
+                                 double dX, double dY, double dZ,
+                                 double X, double Y, double Z,
+                                 double dXFilt, double dYFilt,
+                                 float wx, float wy, float wz,
+                                 float q0, float q1, float q2, float q3,
+                                 double lat, double lon, int state) {
+        super(session_id, timeStamp,
+        ddX, ddY, ddZ,
+        dX, dY, dZ,
+        X, Y, Z,
+        dXFilt, dYFilt,
+        wx, wy, wz,
+        q0, q1, q2, q3,
+        lat, lon, state);
+
     }
 
-/*
-    public ProcessedDataHistoric newProcessedDataHistoric(){
-        return new ProcessedDataHistoric(session_id, timeStamp,
-                ddX, ddY, ddZ,
-                dX, dY, dZ,
-                X, Y, Z,
-                dXFilt, dYFilt,
-                wx, wy, wz,
-                q0, q1, q2, q3,
-                lat, lon, state);
-    } */
+    public ProcessedDataHistoric(ProcessedData processedData) {
+        super(processedData.session_id, processedData.timeStamp,
+                processedData.ddX, processedData.ddY, processedData.ddZ,
+                processedData.dX, processedData.dY, processedData.dZ,
+                processedData.X, processedData.Y, processedData.Z,
+                processedData.dXFilt, processedData.dYFilt,
+                processedData.wx, processedData.wy, processedData.wz,
+                processedData.q0, processedData.q1, processedData.q2, processedData.q3,
+                processedData.lat, processedData.lon, processedData.state);
+    }
 
     public int getId() { return id; }
 
@@ -246,10 +217,10 @@ public class ProcessedData {
         this.state = state;
     }
 
-    /*Comparator for sorting the list by roll no*/
-    public static Comparator<ProcessedData> xSort = new Comparator<ProcessedData>() {
+    /*Comparator for sorting the list by X*/
+    public static Comparator<ProcessedDataHistoric> xSort = new Comparator<ProcessedDataHistoric>() {
 
-        public int compare(ProcessedData pd1, ProcessedData pd2) {
+        public int compare(ProcessedDataHistoric pd1, ProcessedDataHistoric pd2) {
 
             double pd1X = pd1.getX();
             double pd2X = pd2.getX();
