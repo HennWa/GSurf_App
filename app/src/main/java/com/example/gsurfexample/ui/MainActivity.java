@@ -121,6 +121,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(SurfSession surfSession) {
 
+                // Delete all data from processedData db
+                processedDataViewModel.deleteAllProcessedData();
+
                 // Load data from backend db into room db
                 try{
                     List<ProcessedDataHistoric> sessionData =
@@ -135,11 +138,9 @@ public class MainActivity extends AppCompatActivity {
                 }
 
 
-
-
-
-
                 // Here change to session detail view!
+                startActivity(new Intent(MainActivity.this,
+                        SessionDetailsActivity.class));
 
 
 

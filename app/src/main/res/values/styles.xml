@@ -8,6 +8,7 @@
 
     <style name="Theme.TransparentStatusBar" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:fontFamily">@font/ubuntu_light</item>
     </style>
 
     <style name="Theme.StandardFont" parent="Theme.AppCompat.Light.DarkActionBar">

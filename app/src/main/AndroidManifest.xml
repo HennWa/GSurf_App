@@ -61,6 +61,13 @@
 
         <service android:name=".utils.services.DataRecordManager" />
 
+        <activity android:name=".ui.SessionDetailsActivity"
+            android:theme="@style/Theme.TransparentStatusBar"/>
+
+        <activity android:name=".ui.WaveDetailsActivity"
+            android:theme="@style/Theme.TransparentStatusBar"/>
+
+
     </application>
 
 </manifest>

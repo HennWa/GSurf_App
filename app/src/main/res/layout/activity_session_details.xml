@@ -6,15 +6,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/dark_blue_grey"
     tools:context=".ui.MainActivity">
 
     <LinearLayout
         android:id="@+id/main_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerVertical="true"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="35dp"
         android:background="@android:color/transparent"
         android:orientation="vertical">
 
@@ -38,6 +38,8 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/title_box"
             android:layout_marginTop="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             android:background="@color/blue_grey"
             android:textColor="#343434"
             android:orientation="vertical">
@@ -56,141 +58,33 @@
                 android:textColor="@color/water_blue"
                 android:background="@android:color/transparent"/>
 
-            <LinearLayout
-                android:id="@+id/sidebar"
-                android:layout_width="wrap_content"
-                android:layout_height="140dp"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:background="@android:color/transparent"
-                android:orientation="horizontal">
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:scrollbars="horizontal">
 
                 <LinearLayout
-                    android:id="@+id/first_icon"
-                    android:layout_width="120dp"
-                    android:layout_height="100dp"
-                    android:orientation="vertical"
-                    android:layout_marginTop="15dp"
-                    android:background="@android:color/transparent">
-
-                    <ImageView
-                        android:id="@+id/first_icon_image"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        app:srcCompat="@drawable/icon_time"
-                        android:background="@android:color/transparent"
-                        android:layout_gravity="center_horizontal"/>
-
-                    <TextView
-                        android:id="@+id/descrption_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Session Time"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:background="@android:color/transparent"
-                        android:layout_gravity="center_horizontal"/>
-
-                    <TextView
-                        android:id="@+id/value_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="00:00 hr"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:background="@android:color/transparent"
-                        android:layout_gravity="center_horizontal"/>
+                    android:id="@+id/scrollable_linear_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="left">
                 </LinearLayout>
+            </HorizontalScrollView>
 
-                <LinearLayout
-                    android:id="@+id/second_icon"
-                    android:layout_width="120dp"
-                    android:layout_height="100dp"
-                    android:orientation="vertical"
-                    android:layout_marginTop="15dp"
-                    android:background="@android:color/transparent">
-
-                    <ImageView
-                        android:id="@+id/second_icon_image"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        app:srcCompat="@drawable/icon_time"
-                        android:background="@android:color/transparent"
-                        android:layout_gravity="center_horizontal"/>
-
-                    <TextView
-                        android:id="@+id/descrption_second_item"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Session Time"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:background="@android:color/transparent"
-                        android:layout_gravity="center_horizontal"/>
-
-                    <TextView
-                        android:id="@+id/value_second_item"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="00:00 hr"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:background="@android:color/transparent"
-                        android:layout_gravity="center_horizontal"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/third_icon"
-                    android:layout_width="120dp"
-                    android:layout_height="100dp"
-                    android:orientation="vertical"
-                    android:layout_marginTop="15dp"
-                    android:background="@android:color/transparent">
-
-                    <ImageView
-                        android:id="@+id/third_icon_image"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        app:srcCompat="@drawable/icon_time"
-                        android:background="@android:color/transparent"
-                        android:layout_gravity="center_horizontal"/>
-
-                    <TextView
-                        android:id="@+id/descrption_third_item"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Session Time"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:background="@android:color/transparent"
-                        android:layout_gravity="center_horizontal"/>
-
-                    <TextView
-                        android:id="@+id/value_third_item"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="00:00 hr"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:background="@android:color/transparent"
-                        android:layout_gravity="center_horizontal"/>
-                </LinearLayout>
-
-
-            </LinearLayout>
         </LinearLayout>
 
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:id="@+id/map"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="42dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             map:cameraZoom="20"
@@ -204,9 +98,9 @@
         android:text="Show Waves "
         android:textColor="@color/white"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="30dp"
+        android:layout_marginRight="28dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="70dp"/>
+        android:layout_marginBottom="90dp"/>
 
     <RadioButton
         android:id="@+id/toggle_paddle"
@@ -215,9 +109,9 @@
         android:text="Show Paddle"
         android:textColor="@color/white"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="30dp"
+        android:layout_marginRight="28dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="25dp"/>
+        android:layout_marginBottom="55dp"/>
 
 </RelativeLayout>
 
