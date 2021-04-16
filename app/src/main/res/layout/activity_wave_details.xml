@@ -33,7 +33,7 @@
         <LinearLayout
             android:id="@+id/top_box"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/title_box"
             android:layout_marginTop="8dp"
@@ -57,6 +57,20 @@
                 android:textColor="@color/water_blue"
                 android:background="@android:color/transparent"/>
 
+            <TextView
+                android:id="@+id/text_view_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingLeft="8dp"
+                android:text="Wave 8"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:maxLines="1"
+                android:layout_alignParentStart="true"
+                android:ellipsize="end"
+                android:textColor="@color/water_blue"
+                android:background="@android:color/transparent"/>
+
 
             <LinearLayout
                 android:id="@+id/row1"
@@ -64,7 +78,7 @@
                 android:layout_height="120dp"
                 android:layout_centerVertical="true"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="4dp"
                 android:background="@android:color/transparent"
                 android:orientation="horizontal">
 
@@ -80,7 +94,7 @@
                         android:id="@+id/image1"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        app:srcCompat="@drawable/icon_time"
+                        app:srcCompat="@drawable/icon_wave_time"
                         android:background="@android:color/transparent"
                         android:layout_gravity="center_horizontal"/>
 
@@ -89,7 +103,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Session Time"
+                        android:text="Wave Time"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="@color/white"
                         android:background="@android:color/transparent"
@@ -119,7 +133,7 @@
                         android:id="@+id/image2"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        app:srcCompat="@drawable/icon_time"
+                        app:srcCompat="@drawable/icon_distance"
                         android:background="@android:color/transparent"
                         android:layout_gravity="center_horizontal"/>
 
@@ -128,7 +142,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Session Time"
+                        android:text="Surfed Distance"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="@color/white"
                         android:background="@android:color/transparent"
@@ -158,7 +172,7 @@
                         android:id="@+id/image3"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        app:srcCompat="@drawable/icon_time"
+                        app:srcCompat="@drawable/icon_wave"
                         android:background="@android:color/transparent"
                         android:layout_gravity="center_horizontal"/>
 
@@ -167,7 +181,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Session Time"
+                        android:text="Wave Height"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="@color/white"
                         android:background="@android:color/transparent"
@@ -189,10 +203,10 @@
             <LinearLayout
                 android:id="@+id/row2"
                 android:layout_width="wrap_content"
-                android:layout_height="120dp"
+                android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="0dp"
                 android:background="@android:color/transparent"
                 android:orientation="horizontal">
 
@@ -208,7 +222,7 @@
                         android:id="@+id/image4"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        app:srcCompat="@drawable/icon_time"
+                        app:srcCompat="@drawable/icon_speed"
                         android:background="@android:color/transparent"
                         android:layout_gravity="center_horizontal"/>
 
@@ -217,7 +231,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Session Time"
+                        android:text="Max. Speed"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="@color/white"
                         android:background="@android:color/transparent"
@@ -247,7 +261,7 @@
                         android:id="@+id/image5"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        app:srcCompat="@drawable/icon_time"
+                        app:srcCompat="@drawable/icon_speed"
                         android:background="@android:color/transparent"
                         android:layout_gravity="center_horizontal"/>
 
@@ -256,7 +270,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Session Time"
+                        android:text="Average Speed"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="@color/white"
                         android:background="@android:color/transparent"
@@ -286,7 +300,7 @@
                         android:id="@+id/image6"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        app:srcCompat="@drawable/icon_time"
+                        app:srcCompat="@drawable/icon_turns"
                         android:background="@android:color/transparent"
                         android:layout_gravity="center_horizontal"/>
 
@@ -295,7 +309,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Session Time"
+                        android:text="Turns"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="@color/white"
                         android:background="@android:color/transparent"
@@ -314,6 +328,128 @@
                 </LinearLayout>
 
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/row3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="0dp"
+                android:background="@android:color/transparent"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/layout7"
+                    android:layout_width="120dp"
+                    android:layout_height="100dp"
+                    android:orientation="vertical"
+                    android:layout_marginTop="15dp"
+                    android:background="@android:color/transparent">
+
+                    <ImageView
+                        android:id="@+id/image7"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        app:srcCompat="@drawable/icon_score"
+                        android:background="@android:color/transparent"
+                        android:layout_gravity="center_horizontal"/>
+
+                    <TextView
+                        android:id="@+id/descrption7"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Score"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="@color/white"
+                        android:background="@android:color/transparent"
+                        android:layout_gravity="center_horizontal"/>
+
+                    <TextView
+                        android:id="@+id/value7"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="00:00 hr"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="@color/white"
+                        android:background="@android:color/transparent"
+                        android:layout_gravity="center_horizontal"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/placeholder"
+                    android:layout_width="120dp"
+                    android:layout_height="100dp"
+                    android:orientation="vertical"
+                    android:layout_marginTop="15dp"
+                    android:background="@android:color/transparent"/>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:layout_marginTop="40dp">
+                    <ImageView
+                        android:layout_width="120dp"
+                        android:layout_height="60dp"
+                        android:id="@+id/button_wave_stats"
+                        app:srcCompat="@drawable/grey_but"
+                        android:background="@android:color/transparent">
+                    </ImageView>
+                    <TextView
+                        android:id="@+id/text_wave_stats"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Wave Stats"
+                        android:textColor="@color/white"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="16dp"
+                        android:background="@android:color/transparent"/>
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/top_bottom"
+            android:layout_below="@+id/title_box"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@color/blue_grey"
+            android:orientation="vertical">
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart_speed"
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@color/light_blue_grey"
+                android:layout_below="@id/chartX"></com.github.mikephil.charting.charts.LineChart>
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart_angle"
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@color/light_blue_grey"
+                android:layout_below="@id/chartX"></com.github.mikephil.charting.charts.LineChart>
 
         </LinearLayout>
 

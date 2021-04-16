@@ -106,7 +106,9 @@ public class MainActivity extends AppCompatActivity {
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            public boolean onMove(@NonNull RecyclerView recyclerView,
+                                  @NonNull RecyclerView.ViewHolder viewHolder,
+                                  @NonNull RecyclerView.ViewHolder target) {
                 return false;
             }
 
@@ -137,14 +139,9 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-
-                // Here change to session detail view!
+                // Change to session detail view!
                 startActivity(new Intent(MainActivity.this,
                         SessionDetailsActivity.class));
-
-
-
-
             }
         });
 

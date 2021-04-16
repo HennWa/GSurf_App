@@ -41,11 +41,12 @@ public class SessionDetailsActivity extends AppCompatActivity implements OnMapRe
     // Attributes for data access
     private Activity activityContext;
     private ProcessedDataViewModel processedDataViewModel;
+    private PolylineIdentifier polylineIdentifier;
 
     // Attributes for scrollable layout
     private LinearLayout linearLayout;
     private String[] textContent = {"Session Time", "Surfed Waves", "Highest Wave",
-            "Paddle Distance", "Wave Time", "Surfed Distance", "Duck Dives", "Score"};
+            "Paddle Dist.", "Wave Time", "Surfed Distance", "Duck Dives", "Score"};
     private int[] icons = {R.drawable.icon_time, R.drawable.icon_counter, R.drawable.icon_wave,
             R.drawable.icon_paddle_distance, R.drawable.icon_wave_time,
             R.drawable.icon_distance, R.drawable.icon_counter, R.drawable.icon_score};
@@ -80,7 +81,6 @@ public class SessionDetailsActivity extends AppCompatActivity implements OnMapRe
         // Scrollable Layout
         linearLayout = findViewById(R.id.scrollable_linear_layout);
         LayoutInflater layoutInflater = LayoutInflater.from(this);
-
         for(int i=0; i<textContent.length; i++) {
             View view = layoutInflater.inflate(R.layout.icon_item, linearLayout, false);
 
@@ -99,7 +99,6 @@ public class SessionDetailsActivity extends AppCompatActivity implements OnMapRe
         processedDataViewModelFactory = new ProcessedDataViewModelFactory(this.getApplication());
         processedDataViewModel = new ViewModelProvider(this, processedDataViewModelFactory).
                 get(ProcessedDataViewModel.class);
-
     }
 
     @Override
@@ -115,8 +114,42 @@ public class SessionDetailsActivity extends AppCompatActivity implements OnMapRe
         // Observe Live data for polyline plots
         processedDataViewModel.getAllProcessedData().observe(this,
                 new ObserverPolylinePlot(googleMap, getResources()));
-    }
 
+        // Here change activity
+        googleMap.setOnPolylineClickListener(polyline -> {
+
+
+            //here get old wave and paint old color
+
+
+            // highlight plotline
+            polyline.setColor(getResources().getColor(R.color.light_orange));
+
+
+
+
+            // Get identifier
+            polylineIdentifier = (PolylineIdentifier)polyline.getTag();
+        });
+
+        // Buttons
+        TextView buttonWaveDetails = findViewById(R.id.text_wave_details);
+        buttonWaveDetails.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SessionDetailsActivity.this, WaveDetailsActivity.class);
+                if(polylineIdentifier!=null){
+                    intent.putExtra("startIndex", polylineIdentifier.getStartIndex());
+                    intent.putExtra("endIndex", polylineIdentifier.getEndIndex());
+                    intent.putExtra("waveIdentifier", polylineIdentifier.getWaveIdentifier());
+                    startActivity(intent);
+                }else{
+                    Toast.makeText(activityContext, "Select a wave", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+    }
 
     @Override
     protected void onDestroy() {

@@ -2,6 +2,7 @@ package com.example.gsurfexample.ui;
 
 
 import android.content.res.Resources;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
@@ -26,19 +27,25 @@ public class ObserverPolylinePlot implements Observer<List<ProcessedData>> {
     private Polyline polyline1;
     private final GoogleMap googleMap;
     private final Resources resources;
+    private int waveCounter;
+    private int type;
+    private int waveIdentifier;
 
     // Style parameter
     private static final int POLYLINE_STROKE_WIDTH_PX = 12;
 
     ObserverPolylinePlot(GoogleMap googleMap, Resources resources){
         plottedDataSize = 0;
+        type = -1;
+        waveCounter = 1;
         this.googleMap = googleMap;
         this.resources = resources;
-
     }
 
     @Override
     public void onChanged(@Nullable List<ProcessedData> processedDataList) {
+
+        assert processedDataList != null;
         if (processedDataList.size() > 0) {
 
             for(int k = plottedDataSize; k<processedDataList.size(); k++) {
@@ -49,12 +56,16 @@ public class ObserverPolylinePlot implements Observer<List<ProcessedData>> {
 
                     // Check if new data point is of a different type (state)
                     // if so, plot new polyline
-                    if((polyline1 == null) ||
-                            (!GlobalParams.States.values()[processedData.getState()].toString().
-                                    equals(polyline1.getTag().toString()))){
+                    if((polyline1 == null) || (processedData.getState() != type)){
 
-                        //LatLng startPoint = new LatLng(processedData.getLat(),
-                        //        processedData.getLon());
+                        if(polyline1!=null){
+                            // Set last index of polyline
+                            PolylineIdentifier polylineIdentifier = (PolylineIdentifier) polyline1.getTag();
+                            assert polylineIdentifier != null;
+                            polylineIdentifier.setEndIndex(k-1);
+                            polyline1.setTag(polylineIdentifier);
+                        }
+
                         // Add polyline to the map.
                         polyline1 = googleMap.addPolyline(new PolylineOptions()
                                 .clickable(true));
@@ -63,16 +74,24 @@ public class ObserverPolylinePlot implements Observer<List<ProcessedData>> {
                         switch (GlobalParams.States.values()[processedData.getState()].toString()) {
                             // If no type is given, allow the API to use the default.
                             case "SURFINGWAVE":
-                                polyline1.setTag("SURFINGWAVE");
+                                //polyline1.setTag("SURFINGWAVE");
+                                //polyline1.setTag(waveIdentifier);
+                                type = GlobalParams.States.valueOf("SURFINGWAVE").ordinal();
+                                waveCounter += 1;
+                                waveIdentifier = waveCounter;
                                 break;
                             case "FLOATING":
-                                polyline1.setTag("FLOATING");
+                                //polyline1.setTag("FLOATING");
+                                type = GlobalParams.States.valueOf("SURFINGWAVE").ordinal();
+                                waveIdentifier = 0;
                                 break;
                         }
+                        PolylineIdentifier polylineIdentifier = new PolylineIdentifier(type,
+                                waveIdentifier, k, 0);
+                        polyline1.setTag(polylineIdentifier);
 
                         // Adapt styling
                         stylePolyline(polyline1);
-
                     }
 
                     // Add new entries to last polyline in list
@@ -81,7 +100,6 @@ public class ObserverPolylinePlot implements Observer<List<ProcessedData>> {
                             processedData.getLon());
                     pointsPolyline1.add(newPoint);
                     polyline1.setPoints(pointsPolyline1);
-
                 }
             }
             // move camera after every few points
@@ -97,36 +115,31 @@ public class ObserverPolylinePlot implements Observer<List<ProcessedData>> {
      * @param polyline The polyline object that needs styling.
      */
     private void stylePolyline(Polyline polyline) {
-        String type = "";
-        // Get the data object stored with the polyline.
-        if (polyline.getTag() != null) {
-            type = polyline.getTag().toString();
-        }
 
-        switch (type) {
+        PolylineIdentifier polylineIdentifier = (PolylineIdentifier)polyline.getTag();
+
+        // State specific plotting
+        if(polylineIdentifier.getType()==GlobalParams.States.valueOf("FLOATING").ordinal()) {
             // If no type is given, allow the API to use the default.
-            case "SURFINGWAVE":
 
+            // Use a round cap at the start of the line.
+            // Use a custom bitmap as the cap at the start of the line.
+            polyline.setStartCap(
+                    new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.endcap_polyline), 150));
+            polyline.setEndCap(
+                    new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.endcap_polyline), 150));
+            polyline.setWidth(POLYLINE_STROKE_WIDTH_PX);
+            polyline.setColor(resources.getColor(R.color.dark_orange));
+            polyline.setJointType(JointType.ROUND);
+        }else { // if Surfing wave
                 // Use a custom bitmap as the cap at the start of the line.
-                polyline.setStartCap(
-                        new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.endcap_polyline), 150));
-                polyline.setEndCap(
-                        new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.endcap_polyline), 150));
-                polyline.setWidth(POLYLINE_STROKE_WIDTH_PX);
-                polyline.setColor(resources.getColor(R.color.light_green));
-                polyline.setJointType(JointType.ROUND);
-                break;
-            case "FLOATING":
-                // Use a round cap at the start of the line.
-                // Use a custom bitmap as the cap at the start of the line.
-                polyline.setStartCap(
-                        new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.endcap_polyline), 150));
-                polyline.setEndCap(
-                        new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.endcap_polyline), 150));
-                polyline.setWidth(POLYLINE_STROKE_WIDTH_PX);
-                polyline.setColor(resources.getColor(R.color.dark_orange));
-                polyline.setJointType(JointType.ROUND);
-                break;
+            polyline.setStartCap(
+                    new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.endcap_polyline), 150));
+            polyline.setEndCap(
+                    new CustomCap(BitmapDescriptorFactory.fromResource(R.drawable.endcap_polyline), 150));
+            polyline.setWidth(POLYLINE_STROKE_WIDTH_PX);
+            polyline.setColor(resources.getColor(R.color.light_green));
+            polyline.setJointType(JointType.ROUND);
         }
     }
 }

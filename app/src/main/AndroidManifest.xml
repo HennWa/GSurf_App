@@ -67,6 +67,9 @@
         <activity android:name=".ui.WaveDetailsActivity"
             android:theme="@style/Theme.TransparentStatusBar"/>
 
+        <activity android:name=".ui.WaveAnimationActivity"
+            android:theme="@style/Theme.TransparentStatusBar"/>
+
 
     </application>
 
