@@ -127,21 +127,24 @@ public class MainActivity extends AppCompatActivity {
                 processedDataViewModel.deleteAllProcessedData();
 
                 // Load data from backend db into room db
+                /*
                 try{
                     List<ProcessedDataHistoric> sessionData =
                             processedDataHistoricViewModel.
                                     getProcessedDataHistoricSyncBySessionsId(surfSession.getSessionID());
                     for(int i=0; i<sessionData.size(); i++){
-                        Log.i("MainActivity", "NUmber of data safed + ----" + i);
+                        Log.i("MainActivity", "NUmber of data safed + --------------------------" + sessionData.get(i).getState());
                         processedDataViewModel.insert(sessionData.get(i));
                     }
                 }catch (Exception e) {
                     e.printStackTrace();
-                }
+                }*/
 
                 // Change to session detail view!
-                startActivity(new Intent(MainActivity.this,
-                        SessionDetailsActivity.class));
+                Intent intent = new Intent(MainActivity.this,
+                        SessionDetailsActivity.class);
+                intent.putExtra("sessionID", surfSession.getSessionID());
+                startActivity(intent);
             }
         });
 

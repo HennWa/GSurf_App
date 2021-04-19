@@ -163,7 +163,7 @@ public class WaveDetailsActivity extends AppCompatActivity {
             Quaternion quaternion = new Quaternion(processedData.getQ0(),
                     processedData.getQ1(), processedData.getQ2(), processedData.getQ3());
 
-            addChartEntry(mChart2, (float)dt, (float)(quaternion.toEulerAngles()[1] / Math.PI * 180));
+            addChartEntry(mChart2, (float)dt, (float)(quaternion.toEulerAngles()[1] / Math.PI*180));
         }
 
     }

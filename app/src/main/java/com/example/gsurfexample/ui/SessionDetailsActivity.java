@@ -1,10 +1,6 @@
 package com.example.gsurfexample.ui;
 
-
-import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.os.Bundle;
@@ -16,38 +12,31 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.gsurfexample.R;
 import com.example.gsurfexample.source.local.historic.ProcessedDataHistoric;
-import com.example.gsurfexample.source.local.historic.SurfSession;
-import com.example.gsurfexample.source.local.live.ProcessedData;
 import com.example.gsurfexample.utils.factory.ProcessedDataHistoricViewModelFactory;
-import com.example.gsurfexample.utils.factory.ProcessedDataViewModelFactory;
-import com.example.gsurfexample.utils.factory.TestViewModelFactory;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
 
 import java.util.List;
 
 
 public class SessionDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    // Attributes for data access
-    private Activity activityContext;
-    private ProcessedDataViewModel processedDataViewModel;
-    private PolylineIdentifier polylineIdentifier;
+    private Polyline selectedPolyline;
+    private List<ProcessedDataHistoric> sessionData;
 
-    // Attributes for scrollable layout
-    private LinearLayout linearLayout;
-    private String[] textContent = {"Session Time", "Surfed Waves", "Highest Wave",
+    private final String[] textContent = {"Session Time", "Surfed Waves", "Highest Wave",
             "Paddle Dist.", "Wave Time", "Surfed Distance", "Duck Dives", "Score"};
-    private int[] icons = {R.drawable.icon_time, R.drawable.icon_counter, R.drawable.icon_wave,
+    private final int[] icons = {R.drawable.icon_time, R.drawable.icon_counter, R.drawable.icon_wave,
             R.drawable.icon_paddle_distance, R.drawable.icon_wave_time,
             R.drawable.icon_distance, R.drawable.icon_counter, R.drawable.icon_score};
 
@@ -56,6 +45,25 @@ public class SessionDetailsActivity extends AppCompatActivity implements OnMapRe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session_details);
+
+        // Get parameter
+        Bundle b = getIntent().getExtras();
+        String sessionID = b.getString("sessionID");
+
+        // Get data from processedDataHistoricViewModel
+        ProcessedDataHistoricViewModelFactory processedDataHistoricViewModelFactory;
+        processedDataHistoricViewModelFactory = new ProcessedDataHistoricViewModelFactory(this.getApplication());
+        // Attributes for data access
+        ProcessedDataHistoricViewModel processedDataHistoricViewModel = new ViewModelProvider(this, processedDataHistoricViewModelFactory).
+                get(ProcessedDataHistoricViewModel.class);
+        try{
+            sessionData = processedDataHistoricViewModel.
+                    getProcessedDataHistoricSyncBySessionsId(sessionID);
+        }catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this,"Can not load data",Toast.LENGTH_SHORT).show();
+        }
+
 
         // Styling
         getSupportActionBar().hide();  // hide title bar
@@ -69,8 +77,6 @@ public class SessionDetailsActivity extends AppCompatActivity implements OnMapRe
                 new float[]{0, 1}, Shader.TileMode.CLAMP);
         textViewTitle.getPaint().setShader(textShader);
 
-        // Activity context
-        activityContext = this;
 
         // Map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -79,7 +85,8 @@ public class SessionDetailsActivity extends AppCompatActivity implements OnMapRe
 
 
         // Scrollable Layout
-        linearLayout = findViewById(R.id.scrollable_linear_layout);
+        // Attributes for scrollable layout
+        LinearLayout linearLayout = findViewById(R.id.scrollable_linear_layout);
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         for(int i=0; i<textContent.length; i++) {
             View view = layoutInflater.inflate(R.layout.icon_item, linearLayout, false);
@@ -90,62 +97,54 @@ public class SessionDetailsActivity extends AppCompatActivity implements OnMapRe
             TextView textView = view.findViewById(R.id.description);
             textView.setText(textContent[i]);
 
+            // Get Text views
+            TextView valueView = view.findViewById(R.id.value);
+            valueView.setText(CalculatorStats.calculatePeriod(sessionData));
+
             linearLayout.addView(view);
         }
-
-
-        // Instantiate and connect processedDataViewModel to Live Data
-        ProcessedDataViewModelFactory processedDataViewModelFactory;
-        processedDataViewModelFactory = new ProcessedDataViewModelFactory(this.getApplication());
-        processedDataViewModel = new ViewModelProvider(this, processedDataViewModelFactory).
-                get(ProcessedDataViewModel.class);
     }
 
     @Override
     // onMapReady called when map is ready
     public void onMapReady(GoogleMap googleMap) {
 
-        // Get Text views
-        //TextView timeView = findViewById(R.id.value_time);
-        //TextView numberOfWavesView = findViewById(R.id.value_number_of_waves);
-        //TextView paddleDistanceView = findViewById(R.id.value_paddle_distance);
+        // Draw polylines
+        PolylineDrawer polylineDrawer = new PolylineDrawer(googleMap, getResources());
+        polylineDrawer.drawPolylines(sessionData);
 
 
-        // Observe Live data for polyline plots
-        processedDataViewModel.getAllProcessedData().observe(this,
-                new ObserverPolylinePlot(googleMap, getResources()));
+        // move camera to last position
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(sessionData.get(sessionData.size() - 1).getLat(),
+                        sessionData.get(sessionData.size() - 1).getLon()), 20));
 
-        // Here change activity
+
+        // Polyline listener for selection
         googleMap.setOnPolylineClickListener(polyline -> {
-
-
-            //here get old wave and paint old color
-
-
             // highlight plotline
+            if(selectedPolyline!=null){
+                polylineDrawer.stylePolyline(selectedPolyline);
+            }
             polyline.setColor(getResources().getColor(R.color.light_orange));
 
-
-
-
             // Get identifier
-            polylineIdentifier = (PolylineIdentifier)polyline.getTag();
+            selectedPolyline = polyline;
         });
+
 
         // Buttons
         TextView buttonWaveDetails = findViewById(R.id.text_wave_details);
-        buttonWaveDetails.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SessionDetailsActivity.this, WaveDetailsActivity.class);
-                if(polylineIdentifier!=null){
-                    intent.putExtra("startIndex", polylineIdentifier.getStartIndex());
-                    intent.putExtra("endIndex", polylineIdentifier.getEndIndex());
-                    intent.putExtra("waveIdentifier", polylineIdentifier.getWaveIdentifier());
-                    startActivity(intent);
-                }else{
-                    Toast.makeText(activityContext, "Select a wave", Toast.LENGTH_SHORT).show();
-                }
+        buttonWaveDetails.setOnClickListener(v -> {
+            Intent intent = new Intent(SessionDetailsActivity.this, WaveDetailsActivity.class);
+            PolylineIdentifier polylineIdentifier = (PolylineIdentifier)selectedPolyline.getTag();
+            if(polylineIdentifier!=null){
+                intent.putExtra("startIndex", polylineIdentifier.getStartIndex());
+                intent.putExtra("endIndex", polylineIdentifier.getEndIndex());
+                intent.putExtra("waveIdentifier", polylineIdentifier.getWaveIdentifier());
+                startActivity(intent);
+            }else{
+                Toast.makeText(this, "Select a wave", Toast.LENGTH_SHORT).show();
             }
         });
 
