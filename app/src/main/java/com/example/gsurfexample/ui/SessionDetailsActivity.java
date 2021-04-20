@@ -33,6 +33,7 @@ public class SessionDetailsActivity extends AppCompatActivity implements OnMapRe
 
     private Polyline selectedPolyline;
     private List<ProcessedDataHistoric> sessionData;
+    private String sessionID;
 
     private final String[] textContent = {"Session Time", "Surfed Waves", "Highest Wave",
             "Paddle Dist.", "Wave Time", "Surfed Distance", "Duck Dives", "Score"};
@@ -48,7 +49,7 @@ public class SessionDetailsActivity extends AppCompatActivity implements OnMapRe
 
         // Get parameter
         Bundle b = getIntent().getExtras();
-        String sessionID = b.getString("sessionID");
+        sessionID = b.getString("sessionID");
 
         // Get data from processedDataHistoricViewModel
         ProcessedDataHistoricViewModelFactory processedDataHistoricViewModelFactory;
@@ -122,7 +123,7 @@ public class SessionDetailsActivity extends AppCompatActivity implements OnMapRe
 
         // Polyline listener for selection
         googleMap.setOnPolylineClickListener(polyline -> {
-            // highlight plotline
+            // highlight polyline
             if(selectedPolyline!=null){
                 polylineDrawer.stylePolyline(selectedPolyline);
             }
@@ -139,6 +140,7 @@ public class SessionDetailsActivity extends AppCompatActivity implements OnMapRe
             Intent intent = new Intent(SessionDetailsActivity.this, WaveDetailsActivity.class);
             PolylineIdentifier polylineIdentifier = (PolylineIdentifier)selectedPolyline.getTag();
             if(polylineIdentifier!=null){
+                intent.putExtra("sessionID", sessionID);
                 intent.putExtra("startIndex", polylineIdentifier.getStartIndex());
                 intent.putExtra("endIndex", polylineIdentifier.getEndIndex());
                 intent.putExtra("waveIdentifier", polylineIdentifier.getWaveIdentifier());

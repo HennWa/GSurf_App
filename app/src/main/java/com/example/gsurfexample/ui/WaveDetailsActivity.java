@@ -26,6 +26,7 @@ import com.example.gsurfexample.source.local.historic.ProcessedDataHistoric;
 import com.example.gsurfexample.source.local.historic.SurfSession;
 import com.example.gsurfexample.source.local.live.ProcessedData;
 import com.example.gsurfexample.utils.algorithms.Quaternion;
+import com.example.gsurfexample.utils.factory.ProcessedDataHistoricViewModelFactory;
 import com.example.gsurfexample.utils.factory.ProcessedDataViewModelFactory;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -44,7 +45,7 @@ public class WaveDetailsActivity extends AppCompatActivity {
 
     // Attributes for data access
     private Activity activityContext;
-    private ProcessedDataViewModel processedDataViewModel;
+    private ProcessedDataHistoricViewModel processedDataHistoricViewModel;
 
     private LineChart mChart;
     private LineChart mChart2;
@@ -56,6 +57,7 @@ public class WaveDetailsActivity extends AppCompatActivity {
 
         // Get parameter
         Bundle b = getIntent().getExtras();
+        String sessionID = b.getString("sessionID");
         int startIndex = b.getInt("startIndex");
         int endIndex = b.getInt("endIndex");
 
@@ -86,20 +88,21 @@ public class WaveDetailsActivity extends AppCompatActivity {
         });
 
         // Instantiate and connect processedDataViewModel to Live Data
-        ProcessedDataViewModelFactory processedDataViewModelFactory;
-        processedDataViewModelFactory = new ProcessedDataViewModelFactory(this.getApplication());
-        processedDataViewModel = new ViewModelProvider(this, processedDataViewModelFactory).
-                get(ProcessedDataViewModel.class);
+        ProcessedDataHistoricViewModelFactory processedDataHistoricViewModelFactory;
+        processedDataHistoricViewModelFactory = new ProcessedDataHistoricViewModelFactory(this.getApplication());
+        processedDataHistoricViewModel = new ViewModelProvider(this, processedDataHistoricViewModelFactory).
+                get(ProcessedDataHistoricViewModel.class);
 
         // Get Wave specific data
-        List<ProcessedData> currentProcessedData;
-        List<ProcessedData> waveProcessedData = new ArrayList();
+        List<ProcessedDataHistoric> sessionData;
+        List<ProcessedDataHistoric> waveProcessedData = new ArrayList();
         try {
-            currentProcessedData = processedDataViewModel.getAllProcessedDataSync();
-            if(currentProcessedData != null){
+            sessionData = processedDataHistoricViewModel.
+                    getProcessedDataHistoricSyncBySessionsId(sessionID);;
+            if(sessionData != null){
 
                 // here still a proper data access by sql
-                waveProcessedData = currentProcessedData.subList(startIndex, endIndex + 1);
+                waveProcessedData = sessionData.subList(startIndex, endIndex + 1);
 
             }else{
                 Toast.makeText(this,"Cannot load wave data",Toast.LENGTH_SHORT).show();
