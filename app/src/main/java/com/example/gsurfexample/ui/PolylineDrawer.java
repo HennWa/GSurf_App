@@ -13,6 +13,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PolylineDrawer {
@@ -23,16 +24,20 @@ public class PolylineDrawer {
     private int type;
     private int waveIdentifier;
     private final Resources resources;
+    private final int resamplePlotFactor;
 
     public PolylineDrawer(GoogleMap googleMap, Resources resources) {
         this.type = -1;
         this.waveCounter = 1;
         this.googleMap = googleMap;
         this.resources = resources;
+        this.resamplePlotFactor = 1;
     }
 
     public void drawPolylines(List<? extends ProcessedData> sessionData){
         if (sessionData.size() > 0) {
+
+            List<LatLng> pointsPolyline1 = new ArrayList<>();
 
             for(int k = 0; k<sessionData.size(); k++) {
 
@@ -41,6 +46,12 @@ public class PolylineDrawer {
                 // Check if new data point is of a different type (state)
                 // if so, plot new polyline
                 if((polyline1 == null) || (processedData.getState() != type)){
+
+                    if(polyline1 != null){
+                        // Draw last polyline and empty point list
+                        polyline1.setPoints(pointsPolyline1);
+                        pointsPolyline1 = new ArrayList<>();
+                    }
 
                     // Add polyline to the map.
                     polyline1 = googleMap.addPolyline(new PolylineOptions().clickable(true));
@@ -72,13 +83,14 @@ public class PolylineDrawer {
                 polyline1.setTag(polylineIdentifier);
 
                 // Add new entries to last polyline in list
-                List<LatLng> pointsPolyline1 = polyline1.getPoints();
-                LatLng newPoint = new LatLng(processedData.getLat(),
-                        processedData.getLon());
-                pointsPolyline1.add(newPoint);
-                polyline1.setPoints(pointsPolyline1);
-
+                if(k%resamplePlotFactor == 0){
+                    LatLng newPoint = new LatLng(processedData.getLat(),
+                            processedData.getLon());
+                    pointsPolyline1.add(newPoint);
+                }
             }
+            // Draw last polyline of iteration
+            polyline1.setPoints(pointsPolyline1);
         }
     }
 
